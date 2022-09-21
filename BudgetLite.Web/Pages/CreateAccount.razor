@@ -1,5 +1,7 @@
 ﻿@page "/signup"
 
+@inject IUserService userService
+
 <EditForm Model="@request" OnValidSubmit="OnValidSubmit">
 <DataAnnotationsValidator />
 
@@ -8,15 +10,15 @@
         <MudText Typo="Typo.h5">Create Account</MudText>
     </MudCardHeader>
     <MudCardContent>
-        <MudTextField Label="Username" @bind-Value="request.Username" or="@(() => request.Username)" />
-        <MudTextField Label="First Name" @bind-Value="request.FirstName" or="@(() => request.FirstName)" />
-        <MudTextField Label="Last Name" @bind-Value="request.LastName" or="@(() => request.LastName)" />
-        <MudTextField Label="Email" @bind-Value="request.Email" or="@(() => request.Email)" InputType="InputType.Email" />
-        <MudTextField Label="Password" @bind-Value="request.Password" or="@(() => request.Password)" InputType="InputType.Password" />
-        <MudTextField Label="Confirm Password" @bind-Value="request.ConfirmPassword" or="@(() => request.ConfirmPassword)" InputType="InputType.Password" />
+        <MudTextField Label="Username" @bind-Value="request.Username" For="@(() => request.Username)" />
+        <MudTextField Label="First Name" @bind-Value="request.FirstName" For="@(() => request.FirstName)" />
+        <MudTextField Label="Last Name" @bind-Value="request.LastName" For="@(() => request.LastName)" />
+        <MudTextField Label="Email" @bind-Value="request.Email" For="@(() => request.Email)" InputType="InputType.Email" />
+        <MudTextField Label="Password" @bind-Value="request.Password" For="@(() => request.Password)" InputType="InputType.Password" />
+        <MudTextField Label="Confirm Password" @bind-Value="request.ConfirmPassword" For="@(() => request.ConfirmPassword)" InputType="InputType.Password" />
     </MudCardContent>
     <MudCardActions>
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" ColFor="Color.Primary" Class="ml-auto">Register</MudButton>
     </MudCardActions>
 </MudCard>
 
@@ -26,9 +28,10 @@
     CreateAccountRequest request = new CreateAccountRequest();
     bool success;
 
-    private void OnValidSubmit(EditContext context)
+    private async Task OnValidSubmit(EditContext context)
     {
         success = true;
+        await userService.CreateUser(request);
         StateHasChanged();
     }
 }

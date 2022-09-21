@@ -1,0 +1,9 @@
+﻿<AuthorizeView>
+    <Authorized>
+        <MudText Typo="Typo.button">@context.User.Identity?.Name!</MudText>
+    </Authorized>
+    <NotAuthorized>
+        <MudButton Class="mr-3" Variant="Variant.Text" StartIcon="@Icons.Filled.Login" Color="Color.Inherit" Href="login">Login</MudButton>
+        <MudButton Variant="Variant.Text" StartIcon="@Icons.Filled.PersonAdd" Color="Color.Inherit" Href="signup">Sign Up</MudButton>
+    </NotAuthorized>
+</AuthorizeView>

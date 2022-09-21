@@ -9,8 +9,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5">Budget Lite</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.Login" Color="Color.Inherit" Href="login" />
-        <MudIconButton Icon="@Icons.Filled.PersonAdd" Color="Color.Inherit" Href="signup" />
+        <UserDisplay />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />

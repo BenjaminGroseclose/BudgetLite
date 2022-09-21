@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BudgetLite.Data.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace BudgetLite.Data
 {
-    public class BudgetLteContext : DbContext
+    public class BudgetLteContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         /// <summary>
         /// Name of DB
