@@ -1,4 +1,5 @@
 ﻿@page "/signup"
+@using BudgetLite.Data.Models
 
 @inject IUserService userService
 
@@ -33,5 +34,7 @@
         success = true;
         await userService.CreateUser(request);
         StateHasChanged();
+
+        await RevalidatingIdentityAuthenticationStateProvider<User>.C
     }
 }

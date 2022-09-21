@@ -26,7 +26,14 @@ builder.Services.AddTransient<IUserService, UserService>();
 // Entity Framework & Identity
 builder.Services.AddDbContextFactory<BudgetLteContext>(opt =>
     opt.UseSqlite($"Data Source={nameof(BudgetLteContext.BudgetLteContextDb)}.db"));
-builder.Services.AddDefaultIdentity<User>()
+builder.Services.AddDefaultIdentity<User>(options =>
+{
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 7;
+})
     .AddRoles<IdentityRole<int>>()
     .AddEntityFrameworkStores<BudgetLteContext>();
 

@@ -9,6 +9,8 @@ namespace BudgetLite.Data.Models
 {
     public class User : IdentityUser<int>
     {
+        public User() { }
+
         public User(string firstName, string lastName, string email, string username)
         {
             this.FirstName = firstName;

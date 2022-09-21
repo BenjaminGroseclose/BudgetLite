@@ -1,6 +1,7 @@
 ﻿using BudgetLite.Data.Models;
 using BudgetLite.Services.Interfaces;
 using BudgetLite.Services.Requests;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,6 @@ namespace BudgetLite.Services
 
             if (result.Succeeded)
             {
-                await this.signInManager.SignInAsync(newUser, isPersistent: false);
             }
             else
             {
