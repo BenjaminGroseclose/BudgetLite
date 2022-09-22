@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BudgetLite.Data.Migrations
 {
-    [DbContext(typeof(BudgetLteContext))]
+    [DbContext(typeof(BudgetLiteContext))]
     partial class BudgetLteContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

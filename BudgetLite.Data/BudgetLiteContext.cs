@@ -6,18 +6,18 @@ using System.Diagnostics;
 
 namespace BudgetLite.Data
 {
-    public class BudgetLteContext : IdentityDbContext<User, IdentityRole<int>, int>
+    public class BudgetLiteContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         /// <summary>
         /// Name of DB
         /// </summary>
-        public static readonly string BudgetLteContextDb = nameof(BudgetLteContext).ToLower();
+        public static readonly string BudgetLteContextDb = nameof(BudgetLiteContext).ToLower();
 
         /// <summary>
-        /// Creates a new <see cref="BudgetLteContext"/>
+        /// Creates a new <see cref="BudgetLiteContext"/>
         /// </summary>
         /// <param name="options">The DbContext options <see cref="DbContextOptions"/></param>
-        public BudgetLteContext(DbContextOptions<BudgetLteContext> options): base(options) { }
+        public BudgetLiteContext(DbContextOptions<BudgetLiteContext> options): base(options) { }
 
         /// <summary>
         /// Define the models.

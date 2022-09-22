@@ -24,8 +24,8 @@ builder.Services.AddMudServices();
 builder.Services.AddTransient<IUserService, UserService>();
 
 // Entity Framework & Identity
-builder.Services.AddDbContextFactory<BudgetLteContext>(opt =>
-    opt.UseSqlite($"Data Source={nameof(BudgetLteContext.BudgetLteContextDb)}.db"));
+builder.Services.AddDbContextFactory<BudgetLiteContext>(opt =>
+    opt.UseSqlite($"Data Source={nameof(BudgetLiteContext.BudgetLteContextDb)}.db"));
 builder.Services.AddDefaultIdentity<User>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
@@ -35,7 +35,7 @@ builder.Services.AddDefaultIdentity<User>(options =>
     options.Password.RequiredLength = 7;
 })
     .AddRoles<IdentityRole<int>>()
-    .AddEntityFrameworkStores<BudgetLteContext>();
+    .AddEntityFrameworkStores<BudgetLiteContext>();
 
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 

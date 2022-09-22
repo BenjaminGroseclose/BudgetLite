@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BudgetLite.Data.Migrations
 {
-    [DbContext(typeof(BudgetLteContext))]
+    [DbContext(typeof(BudgetLiteContext))]
     [Migration("20220921025137_CreateUserTables")]
     partial class CreateUserTables
     {
