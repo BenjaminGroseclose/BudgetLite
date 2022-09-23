@@ -1,14 +1,10 @@
 ﻿using BudgetLite.Services.Requests;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BudgetLite.Services.Responses;
 
 namespace BudgetLite.Services.Interfaces
 {
     public interface IUserService
     {
-        Task CreateUser(CreateAccountRequest createAccountRequest);
+        Task<CreateAccountResponse> CreateUser(CreateAccountRequest createAccountRequest);
     }
 }

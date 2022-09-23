@@ -1,8 +1,10 @@
 ﻿using BudgetLite.Data.Models;
 using BudgetLite.Services.Interfaces;
 using BudgetLite.Services.Requests;
+using BudgetLite.Services.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,15 +16,15 @@ namespace BudgetLite.Services
     public class UserService : IUserService
     {
         private readonly UserManager<User> userManager;
-        private readonly SignInManager<User> signInManager;
+        private readonly ILogger<UserService> logger;
 
-        public UserService(UserManager<User> userManager, SignInManager<User> signInManager)
+        public UserService(ILogger<UserService> logger, UserManager<User> userManager, SignInManager<User> signInManager)
         {
+            this.logger = logger;
             this.userManager = userManager;
-            this.signInManager = signInManager;
         }
 
-        public async Task CreateUser(CreateAccountRequest createAccountRequest)
+        public async Task<CreateAccountResponse> CreateUser(CreateAccountRequest createAccountRequest)
         {
             if (!createAccountRequest.IsValid())
             {
@@ -40,11 +42,13 @@ namespace BudgetLite.Services
 
             if (result.Succeeded)
             {
+                this.logger.LogInformation("Successfully created user: {username}", newUser.UserName);
+                return new CreateAccountResponse(true, newUser, string.Empty);
             }
             else
             {
-                // TODO: Log error someway
-                throw new ArgumentException($"Was not able to create a new account.");
+                this.logger.LogError(result.Errors.ElementAt(0).Description);
+                return new CreateAccountResponse(false, null, result.Errors.ElementAt(0).Description);
             }
         }
     }

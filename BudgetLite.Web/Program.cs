@@ -3,12 +3,15 @@ using BudgetLite.Data.Models;
 using BudgetLite.Services;
 using BudgetLite.Services.Interfaces;
 using BudgetLite.Web;
+using BudgetLite.Web.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,12 +21,24 @@ StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configurat
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(options =>
+{
+    options.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+    options.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
+    options.SnackbarConfiguration.PreventDuplicates = false;
+    options.SnackbarConfiguration.NewestOnTop = false;
+    options.SnackbarConfiguration.ShowCloseIcon = true;
+    options.SnackbarConfiguration.VisibleStateDuration = 10000;
+    options.SnackbarConfiguration.HideTransitionDuration = 500;
+    options.SnackbarConfiguration.ShowTransitionDuration = 500;
+});
 
 // Services
+
 builder.Services.AddTransient<IUserService, UserService>();
 
 // Entity Framework & Identity
+builder.Services.AddAuthenticationCore();
 builder.Services.AddDbContextFactory<BudgetLiteContext>(opt =>
     opt.UseSqlite($"Data Source={nameof(BudgetLiteContext.BudgetLteContextDb)}.db"));
 builder.Services.AddDefaultIdentity<User>(options =>
@@ -37,7 +52,8 @@ builder.Services.AddDefaultIdentity<User>(options =>
     .AddRoles<IdentityRole<int>>()
     .AddEntityFrameworkStores<BudgetLiteContext>();
 
-builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
 var app = builder.Build();
 

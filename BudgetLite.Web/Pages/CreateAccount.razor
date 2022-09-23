@@ -1,27 +1,38 @@
 ﻿@page "/signup"
 @using BudgetLite.Data.Models
+@using BudgetLite.Web.Authentication
+@using Microsoft.AspNetCore.Identity
 
 @inject IUserService userService
+@inject ISnackbar snackbar
+@inject UserManager<User> userManager;
+@inject AuthenticationStateProvider authenticationStateProvider;
+@inject NavigationManager navigationManager;
 
 <EditForm Model="@request" OnValidSubmit="OnValidSubmit">
-<DataAnnotationsValidator />
+    <DataAnnotationsValidator />
 
-<MudCard>
-    <MudCardHeader>
-        <MudText Typo="Typo.h5">Create Account</MudText>
-    </MudCardHeader>
-    <MudCardContent>
-        <MudTextField Label="Username" @bind-Value="request.Username" For="@(() => request.Username)" />
-        <MudTextField Label="First Name" @bind-Value="request.FirstName" For="@(() => request.FirstName)" />
-        <MudTextField Label="Last Name" @bind-Value="request.LastName" For="@(() => request.LastName)" />
-        <MudTextField Label="Email" @bind-Value="request.Email" For="@(() => request.Email)" InputType="InputType.Email" />
-        <MudTextField Label="Password" @bind-Value="request.Password" For="@(() => request.Password)" InputType="InputType.Password" />
-        <MudTextField Label="Confirm Password" @bind-Value="request.ConfirmPassword" For="@(() => request.ConfirmPassword)" InputType="InputType.Password" />
-    </MudCardContent>
-    <MudCardActions>
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" ColFor="Color.Primary" Class="ml-auto">Register</MudButton>
-    </MudCardActions>
-</MudCard>
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">Create Account</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTextField Label="Username" @bind-Value="request.Username" For="@(() => request.Username)" />
+            <MudTextField Label="First Name" @bind-Value="request.FirstName" For="@(() => request.FirstName)" />
+            <MudTextField Label="Last Name" @bind-Value="request.LastName" For="@(() => request.LastName)" />
+            <MudTextField Label="Email" @bind-Value="request.Email" For="@(() => request.Email)"
+                InputType="InputType.Email" />
+            <MudTextField Label="Password" @bind-Value="request.Password" For="@(() => request.Password)"
+                InputType="InputType.Password" />
+            <MudTextField Label="Confirm Password" @bind-Value="request.ConfirmPassword"
+                For="@(() => request.ConfirmPassword)" InputType="InputType.Password" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" ColFor="Color.Primary" Class="ml-auto">
+                Register
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
 
 </EditForm>
 
@@ -32,7 +43,26 @@
     private async Task OnValidSubmit(EditContext context)
     {
         success = true;
-        await userService.CreateUser(request);
+        var result = await userService.CreateUser(request);
+
+        if (result.Succeeded)
+        {
+            var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)this.authenticationStateProvider;
+
+            await customAuthenticationStateProvider.UpdateAuthenticationState(new UserSession
+                {
+                    Username = result.CreatedUser.UserName,
+                    Email = result.CreatedUser.Email,
+                    Role = "Admin" // TODO: Do we need role?
+                });
+
+            navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            this.snackbar.Add(result.ErrorMessage, Severity.Error);
+        }
+
         StateHasChanged();
     }
 }

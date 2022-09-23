@@ -1,9 +1,76 @@
 ﻿@page "/login"
+@using BudgetLite.Data.Models
+@using BudgetLite.Web.Authentication
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
 
-<MudText Typo="Typo.h5">Login</MudText>
+@inject UserManager<User> userManager;
+@inject AuthenticationStateProvider authenticationStateProvider;
+@inject NavigationManager navigationManager;
 
-<!-- https://stackoverflow.com/questions/58940504/net-blazor-login-without-identity-scaffolding -->
+<EditForm Model="@model" OnValidSubmit="Authenticate">
+    <DataAnnotationsValidator />
+
+    <MudCard >
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">Login</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTextField Label="Username" @bind-Value="model.Username" For="@(() => model.Username)" />
+            <MudTextField Label="Password" @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" ColFor="Color.Primary" Class="ml-auto">
+                Login
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+
+</EditForm>
 
 @code {
+
+    // TODO: Consdier moving this to service;
+    private class Model
+    {
+        [Required]
+        public string Username { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
+
+    private Model model = new Model();
+
+    private async Task Authenticate()
+    {
+        var user = await this.userManager.FindByNameAsync(model.Username);
+
+        if (user == null)
+        {
+            // Set login error
+        }
+
+        var loginResult = await this.userManager.CheckPasswordAsync(user, model.Password);
+
+        if (loginResult == false)
+        {
+            // Set login error
+        }
+        else
+        {
+            var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)this.authenticationStateProvider;
+
+            await customAuthenticationStateProvider.UpdateAuthenticationState(new UserSession
+            {
+                Username = user.UserName,
+                Email = user.Email,
+                Role = "Admin" // TODO: Do we need role?
+            });
+
+            navigationManager.NavigateTo("/");
+            StateHasChanged();
+        }
+
+    }
 
 }
