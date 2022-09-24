@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
 
 namespace BudgetLite.Web.Authentication
 {
@@ -64,7 +63,7 @@ namespace BudgetLite.Web.Authentication
                     new Claim(ClaimTypes.Email, userSession.Email),
                 }, "CustomAuthentication");
 
-                var claimsPrinciple = new ClaimsPrincipal(claimsIdentity);
+                claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
             }
             else
             {

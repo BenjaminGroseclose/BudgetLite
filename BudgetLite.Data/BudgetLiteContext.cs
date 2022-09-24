@@ -11,13 +11,13 @@ namespace BudgetLite.Data
         /// <summary>
         /// Name of DB
         /// </summary>
-        public static readonly string BudgetLteContextDb = nameof(BudgetLiteContext).ToLower();
+        public static readonly string BudgetLiteContextDb = nameof(BudgetLiteContext).ToLower();
 
         /// <summary>
         /// Creates a new <see cref="BudgetLiteContext"/>
         /// </summary>
         /// <param name="options">The DbContext options <see cref="DbContextOptions"/></param>
-        public BudgetLiteContext(DbContextOptions<BudgetLiteContext> options): base(options) { }
+        public BudgetLiteContext(DbContextOptions<BudgetLiteContext> options) : base(options) { }
 
         /// <summary>
         /// Define the models.

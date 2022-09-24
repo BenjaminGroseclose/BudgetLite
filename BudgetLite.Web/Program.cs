@@ -1,7 +1,5 @@
 using BudgetLite.Data;
 using BudgetLite.Data.Models;
-using BudgetLite.Services;
-using BudgetLite.Services.Interfaces;
 using BudgetLite.Web;
 using BudgetLite.Web.Authentication;
 using Microsoft.AspNetCore.Components;
@@ -35,12 +33,10 @@ builder.Services.AddMudServices(options =>
 
 // Services
 
-builder.Services.AddTransient<IUserService, UserService>();
-
 // Entity Framework & Identity
 builder.Services.AddAuthenticationCore();
 builder.Services.AddDbContextFactory<BudgetLiteContext>(opt =>
-    opt.UseSqlite($"Data Source={nameof(BudgetLiteContext.BudgetLteContextDb)}.db"));
+    opt.UseSqlite($"Data Source={nameof(BudgetLiteContext.BudgetLiteContextDb)}.db"));
 builder.Services.AddDefaultIdentity<User>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;

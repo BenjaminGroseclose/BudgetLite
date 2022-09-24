@@ -4,25 +4,29 @@
 @using Microsoft.AspNetCore.Identity
 @using System.ComponentModel.DataAnnotations
 
+@inject ISnackbar snackbar
 @inject UserManager<User> userManager;
 @inject AuthenticationStateProvider authenticationStateProvider;
 @inject NavigationManager navigationManager;
 
-<EditForm Model="@model" OnValidSubmit="Authenticate">
+<EditForm Model="@model" OnValidSubmit="Authenticate" style="max-width: 800px; margin: auto;">
     <DataAnnotationsValidator />
 
-    <MudCard >
+    <MudCard>
         <MudCardHeader>
             <MudText Typo="Typo.h5">Login</MudText>
         </MudCardHeader>
         <MudCardContent>
             <MudTextField Label="Username" @bind-Value="model.Username" For="@(() => model.Username)" />
             <MudTextField Label="Password" @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+            @if(loginErrorOccured)
+            {
+                <MudText Typo="Typo.subtitle1" Color="Color.Error">Username or Password were incorrect, please try again.</MudText>
+            }
         </MudCardContent>
-        <MudCardActions>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" ColFor="Color.Primary" Class="ml-auto">
-                Login
-            </MudButton>
+        <MudCardActions >
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" Class="ml-auto mr-3" Href="/">Cancel</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Login</MudButton>
         </MudCardActions>
     </MudCard>
 
@@ -30,16 +34,8 @@
 
 @code {
 
-    // TODO: Consdier moving this to service;
-    private class Model
-    {
-        [Required]
-        public string Username { get; set; }
-        [Required]
-        public string Password { get; set; }
-    }
-
     private Model model = new Model();
+    private bool loginErrorOccured = false;
 
     private async Task Authenticate()
     {
@@ -47,17 +43,22 @@
 
         if (user == null)
         {
-            // Set login error
+            loginErrorOccured = true;
+            this.snackbar.Add("Username or Password were incorrect, please try again.", Severity.Error);
+            return;
         }
 
         var loginResult = await this.userManager.CheckPasswordAsync(user, model.Password);
 
         if (loginResult == false)
         {
-            // Set login error
+            loginErrorOccured = true;
+            this.snackbar.Add("Username or Password were incorrect, please try again.", Severity.Error);
+            return;
         }
         else
         {
+            loginErrorOccured = false;
             var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)this.authenticationStateProvider;
 
             await customAuthenticationStateProvider.UpdateAuthenticationState(new UserSession
@@ -71,6 +72,14 @@
             StateHasChanged();
         }
 
+    }
+
+    private class Model
+    {
+        [Required]
+        public string Username { get; set; }
+        [Required]
+        public string Password { get; set; }
     }
 
 }

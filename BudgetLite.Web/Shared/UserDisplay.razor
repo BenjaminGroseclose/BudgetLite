@@ -1,9 +1,24 @@
-﻿<AuthorizeView>
+﻿@using BudgetLite.Web.Authentication
+@inject AuthenticationStateProvider authenticationStateProvider;
+
+<AuthorizeView>
     <Authorized>
-        <MudText Typo="Typo.button">@context.User.Identity?.Name!</MudText>
+        <MudText Typo="Typo.subtitle1" Class="mr-3">@context.User.Identity?.Name</MudText>
+        <MudButton Variant="Variant.Text" StartIcon="@Icons.Filled.Logout" Color="Color.Inherit" OnClick="Logout">Logout</MudButton>
     </Authorized>
     <NotAuthorized>
         <MudButton Class="mr-3" Variant="Variant.Text" StartIcon="@Icons.Filled.Login" Color="Color.Inherit" Href="login">Login</MudButton>
         <MudButton Variant="Variant.Text" StartIcon="@Icons.Filled.PersonAdd" Color="Color.Inherit" Href="signup">Sign Up</MudButton>
     </NotAuthorized>
 </AuthorizeView>
+
+
+@code {
+
+    public async Task Logout()
+    {
+        var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)this.authenticationStateProvider;
+        await customAuthenticationStateProvider.UpdateAuthenticationState(null);
+    }
+
+}
