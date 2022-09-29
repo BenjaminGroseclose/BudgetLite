@@ -1,0 +1,39 @@
+﻿
+@if (isEdit)
+{
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">@Budget.Name</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudText Typo="Typo.body1">@Budget.Description</MudText>
+            <MudText Typo="Typo.body1">$: @Budget.Amount</MudText>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton OnClick="() => isEdit = true" Color="Color.Primary">Edit</MudButton>
+        </MudCardActions>
+    </MudCard>
+}
+else
+{
+    <EditForm>
+        <MudCard>
+
+        </MudCard>
+    </EditForm>
+}
+
+
+@code {
+    [Parameter]
+    public Budget Budget { get; set; }
+
+
+    bool isEdit = false;
+
+    public async Task Save()
+    {
+
+    }
+
+}

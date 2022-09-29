@@ -13,6 +13,10 @@ namespace BudgetLite.Data
         /// </summary>
         public static readonly string BudgetLiteContextDb = nameof(BudgetLiteContext).ToLower();
 
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<BudgetPeriod> BudgetPeriods { get; set; }
+        public DbSet<Budget> Budgets { get; set; }
+
         /// <summary>
         /// Creates a new <see cref="BudgetLiteContext"/>
         /// </summary>
@@ -25,6 +29,10 @@ namespace BudgetLite.Data
         /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Transaction>().HasOne(x => x.BudgetPeriod).WithMany(x => x.Transactions);
+            modelBuilder.Entity<BudgetPeriod>().HasOne(x => x.Budget).WithMany(x => x.BudgetPeriods);
+            modelBuilder.Entity<Budget>().HasOne(x => x.User);
+
             base.OnModelCreating(modelBuilder);
         }
 

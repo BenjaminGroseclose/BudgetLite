@@ -9,6 +9,8 @@
 @inject AuthenticationStateProvider authenticationStateProvider;
 @inject NavigationManager navigationManager;
 
+<PageTitle>BudgetLite - Login</PageTitle>
+
 <EditForm Model="@model" OnValidSubmit="Authenticate" style="max-width: 800px; margin: auto;">
     <DataAnnotationsValidator />
 
@@ -61,12 +63,12 @@
             loginErrorOccured = false;
             var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)this.authenticationStateProvider;
 
-            await customAuthenticationStateProvider.UpdateAuthenticationState(new UserSession
-            {
-                Username = user.UserName,
-                Email = user.Email,
-                Role = "Admin" // TODO: Do we need role?
-            });
+            await customAuthenticationStateProvider.UpdateAuthenticationState(new UserSession(
+                user.UserName,
+                user.Email,
+                $"{user.FirstName} {user.LastName}",
+                user.Id
+            ));
 
             navigationManager.NavigateTo("/");
             StateHasChanged();

@@ -1,0 +1,17 @@
+﻿@page "/budgets"
+@attribute [Authorize]
+
+@inject AuthenticationStateProvider authenticationStateProvider;
+
+
+
+@code {
+    bool loading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await this.authenticationStateProvider.GetAuthenticationStateAsync();
+
+        base.OnInitializedAsync();
+    }
+}

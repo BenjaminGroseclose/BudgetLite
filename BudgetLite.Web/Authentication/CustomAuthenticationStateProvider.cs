@@ -33,8 +33,8 @@ namespace BudgetLite.Web.Authentication
                 var claimsIdentity = new ClaimsIdentity(new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, userSession.Username),
-                    new Claim(ClaimTypes.Role, userSession.Role),
                     new Claim(ClaimTypes.Email, userSession.Email),
+                    new Claim(ClaimTypes.GivenName, userSession.GivenName)
                 }, "CustomAuthentication");
 
                 var claimsPrinciple = new ClaimsPrincipal(claimsIdentity);
@@ -59,8 +59,8 @@ namespace BudgetLite.Web.Authentication
                 var claimsIdentity = new ClaimsIdentity(new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, userSession.Username),
-                    new Claim(ClaimTypes.Role, userSession.Role),
                     new Claim(ClaimTypes.Email, userSession.Email),
+                    new Claim(ClaimTypes.GivenName, userSession.GivenName)
                 }, "CustomAuthentication");
 
                 claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
