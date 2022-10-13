@@ -28,19 +28,32 @@
         </MudCardContent>
         <MudCardActions >
             <MudButton Variant="Variant.Outlined" Color="Color.Error" Class="ml-auto mr-3" Href="/">Cancel</MudButton>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Login</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">
+                @if (isLoading)
+                {
+                    <span>Hello World</span>
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                }
+                else
+                {
+                    <MudText>Login</MudText>
+                }
+            </MudButton>
         </MudCardActions>
     </MudCard>
 
 </EditForm>
 
 @code {
+    bool isLoading = false;
 
     private Model model = new Model();
     private bool loginErrorOccured = false;
 
-    private async Task Authenticate()
+    private async Task Authenticate(EditContext editContext)
     {
+        Console.WriteLine("Output to the console");
+        isLoading = true;
         var user = await this.userManager.FindByNameAsync(model.Username);
 
         if (user == null)
@@ -71,9 +84,9 @@
             ));
 
             navigationManager.NavigateTo("/");
-            StateHasChanged();
         }
 
+        isLoading = false;
     }
 
     private class Model

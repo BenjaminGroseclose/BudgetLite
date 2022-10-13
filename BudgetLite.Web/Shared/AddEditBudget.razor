@@ -1,0 +1,89 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using BudgetLite.Data.Enums
+
+<EditForm Model="@model" OnValidSubmit="SaveAsync">
+    <MudCard>
+        <MudCardHeader>
+            <MudTextField Label="Username" @bind-Value="model.Name" For="@(() => model.Name)" />
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTextField @bind-Value="model.Description" For="@(() => model.Description)" Variant="Variant.Text" Lines="3" />
+            <MudPaper Elevation="0" Class="d-flex flex-row">
+                <MudPaper Elevation="0">
+                    <MudTextField Label="Amount" 
+                                    Variant="Variant.Outlined"
+                                    @bind-Value="model.Amount"
+                                    For="@(() => model.Amount)"
+                                    Adornment="Adornment.Start"
+                                    AdornmentColor="Color.Success"
+                                    AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+                </MudPaper>
+                <MudPaper Elevation="0">
+
+                </MudPaper>
+            </MudPaper>
+        </MudCardContent>
+        <MudCardActions>
+
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public Budget Budget { get; set; }
+
+    Model model = new Model();
+
+    protected override void OnInitialized()
+    {
+        if (Budget == null)
+        {
+            model = new Model();
+        }
+        else
+        {
+            model = new Model(Budget);
+        }
+
+        base.OnInitialized();
+    }
+
+    public async Task SaveAsync()
+    {
+
+    }
+
+    private class Model
+    {
+        public Model() { }
+
+        public Model(Budget budget)
+        {
+        }
+
+        [Required]
+        [MaxLength(80)]
+        public string Name { get; set; }
+
+        [MaxLength(1000)]
+        public string Description { get; set; }
+
+        public Catagory Catagory { get; set; }
+
+        [Required]
+        [Range(0.0, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]
+        public double Amount { get; set; }
+
+        [Required]
+        public DurationType DurationType { get; set; }
+        
+        [Required]
+        [IsBeforeDate("EndDate")]
+        public DateTime StartDate { get; set; }
+
+        [Required]
+        public DateTime EndDate { get; set; }
+    }
+}
