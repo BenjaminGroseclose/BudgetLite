@@ -58,7 +58,7 @@
     private async Task OnValidSubmit(EditContext context)
     {
         isLoading = true;
-        Console.WriteLine("isLoading is true");
+        await Task.Delay(1); // Need for loading spinner
         User newUser = new User(
             firstName: model.FirstName,
             lastName: model.LastName,
@@ -86,7 +86,6 @@
             this.snackbar.Add(result.Errors.ElementAt(0).Description, Severity.Error);
         }
 
-        Console.WriteLine("Is Loading False");
         isLoading = false;
     }
 

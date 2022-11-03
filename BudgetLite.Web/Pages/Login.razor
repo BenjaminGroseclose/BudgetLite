@@ -31,7 +31,6 @@
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">
                 @if (isLoading)
                 {
-                    <span>Hello World</span>
                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
                 }
                 else
@@ -52,13 +51,14 @@
 
     private async Task Authenticate(EditContext editContext)
     {
-        Console.WriteLine("Output to the console");
         isLoading = true;
+        await Task.Delay(1); // Need for loading spinner
         var user = await this.userManager.FindByNameAsync(model.Username);
 
         if (user == null)
         {
             loginErrorOccured = true;
+            isLoading = false;
             this.snackbar.Add("Username or Password were incorrect, please try again.", Severity.Error);
             return;
         }
@@ -68,6 +68,7 @@
         if (loginResult == false)
         {
             loginErrorOccured = true;
+            isLoading = false;
             this.snackbar.Add("Username or Password were incorrect, please try again.", Severity.Error);
             return;
         }
