@@ -4,19 +4,21 @@
 <EditForm Model="@model" OnValidSubmit="SaveAsync">
     <MudCard>
         <MudCardHeader>
-            <MudTextField Label="Username" @bind-Value="model.Name" For="@(() => model.Name)" />
+            <MudTextField Label="Budget Name" @bind-Value="model.Name" For="@(() => model.Name)" />
         </MudCardHeader>
         <MudCardContent>
             <MudTextField @bind-Value="model.Description" For="@(() => model.Description)" Variant="Variant.Text" Lines="3" />
             <MudPaper Elevation="0" Class="d-flex flex-row">
                 <MudPaper Elevation="0">
-                    <MudTextField Label="Amount" 
-                                    Variant="Variant.Outlined"
-                                    @bind-Value="model.Amount"
-                                    For="@(() => model.Amount)"
-                                    Adornment="Adornment.Start"
-                                    AdornmentColor="Color.Success"
-                                    AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+                    <MudTextField 
+                        Label="Amount" 
+                        Variant="Variant.Outlined"
+                        @bind-Value="model.Amount"
+                        For="@(() => model.Amount)"
+                        Adornment="Adornment.Start"
+                        AdornmentColor="Color.Success"
+                        AdornmentIcon="@Icons.Material.Filled.AttachMoney">
+                    </MudTextField>
                 </MudPaper>
                 <MudPaper Elevation="0">
 
@@ -61,6 +63,13 @@
 
         public Model(Budget budget)
         {
+            this.Name = budget.Name;
+            this.Description = budget.Description;
+            this.Catagory = budget.Catagory;
+            this.Amount = budget.Amount;
+            this.DurationType = budget.DurationType;
+            this.StartDate = budget.StartDate;
+            this.EndDate = budget.EndDate;
         }
 
         [Required]

@@ -58,7 +58,7 @@
     private async Task OnValidSubmit(EditContext context)
     {
         isLoading = true;
-        await Task.Delay(1); // Need for loading spinner
+        await Task.Delay(1); // Needed for loading spinner
         User newUser = new User(
             firstName: model.FirstName,
             lastName: model.LastName,
