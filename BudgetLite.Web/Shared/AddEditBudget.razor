@@ -1,32 +1,54 @@
 ﻿@using System.ComponentModel.DataAnnotations
 @using BudgetLite.Data.Enums
+@using BudgetLite.Data;
+@using System.Security.Claims;
 
-<EditForm Model="@model" OnValidSubmit="SaveAsync">
+@inject IRepository<Budget> BudgetRepository
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<EditForm Model="@model" OnValidSubmit="SaveAsync"style="max-width: 800px; margin: auto;">
+    <DataAnnotationsValidator />
     <MudCard>
-        <MudCardHeader>
-            <MudTextField Label="Budget Name" @bind-Value="model.Name" For="@(() => model.Name)" />
-        </MudCardHeader>
         <MudCardContent>
-            <MudTextField @bind-Value="model.Description" For="@(() => model.Description)" Variant="Variant.Text" Lines="3" />
-            <MudPaper Elevation="0" Class="d-flex flex-row">
-                <MudPaper Elevation="0">
-                    <MudTextField 
-                        Label="Amount" 
-                        Variant="Variant.Outlined"
-                        @bind-Value="model.Amount"
-                        For="@(() => model.Amount)"
-                        Adornment="Adornment.Start"
-                        AdornmentColor="Color.Success"
-                        AdornmentIcon="@Icons.Material.Filled.AttachMoney">
-                    </MudTextField>
-                </MudPaper>
-                <MudPaper Elevation="0">
-
-                </MudPaper>
-            </MudPaper>
+            <MudTextField Class="mt-2" Label="Budget Name" @bind-Value="model.Name" For="@(() => model.Name)" Variant="Variant.Text" />
+            <MudTextField Class="mt-2" Label="Description" @bind-Value="model.Description" For="@(() => model.Description)" Variant="Variant.Outlined" Lines="2" />
+            <MudSelect Class="mt-2" @bind-bind-Valu="model.Catagory" For="(() => model.Catagory)" Variant="Variant.Outlined">
+                <MudSelectItem Value="@(Catagory.MortgageOrRent)">Mortgage or Rent</MudSelectItem>
+                <MudSelectItem Value="@(Catagory.Transportation)" />
+                <MudSelectItem Value="@(Catagory.Food)" />
+                <MudSelectItem Value="@(Catagory.Utilities)" />
+                <MudSelectItem Value="@(Catagory.Medical)" />
+                <MudSelectItem Value="@(Catagory.Debt)" />
+                <MudSelectItem Value="@(Catagory.Entertainment)" />
+                <MudSelectItem Value="@(Catagory.Savings)" />
+            </MudSelect>
+            <MudTextField Class="mt-2"
+                Label="Amount" 
+                Variant="Variant.Outlined"
+                @bind-Value="model.Amount"
+                For="@(() => model.Amount)"
+                Adornment="Adornment.Start"
+                AdornmentColor="Color.Success"
+                AdornmentIcon="@Icons.Material.Filled.AttachMoney">
+            </MudTextField>
+            <MudRadioGroup Class="mt-2" T="DurationType" @bind-bind-SelectedOption="model.DurationType">
+                <MudRadio Option="@(DurationType.WEEKLY)">Weekly</MudRadio>
+                <MudRadio Option="@(DurationType.MONTHLY)">Monthly</MudRadio>
+                <MudRadio Option="@(DurationType.QUARTERLY)">Quarterly</MudRadio>
+                <MudRadio Option="@(DurationType.YEARLY)">Yearly</MudRadio>
+            </MudRadioGroup>
         </MudCardContent>
         <MudCardActions>
-
+            <MudButton Class="ml-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">
+                @if (isLoading)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                }
+                else
+                {
+                    <MudText>Save</MudText>
+                }
+            </MudButton>
         </MudCardActions>
     </MudCard>
 </EditForm>
@@ -37,6 +59,7 @@
     public Budget Budget { get; set; }
 
     Model model = new Model();
+    bool isLoading = false;
 
     protected override void OnInitialized()
     {
@@ -54,6 +77,31 @@
 
     public async Task SaveAsync()
     {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var currentUser = authState.User;
+
+            int userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+
+            await BudgetRepository.Insert(new Budget()
+                {
+                    Name = model.Name,
+                    Description = model.Description,
+                    Catagory = model.Catagory,
+                    Amount = model.Amount,
+                    UserID = userID
+                });
+        }
+        catch (Exception ex)
+        {
+            if (ex != null)
+            {
+
+            }
+
+            throw;
+        }
 
     }
 
@@ -68,8 +116,6 @@
             this.Catagory = budget.Catagory;
             this.Amount = budget.Amount;
             this.DurationType = budget.DurationType;
-            this.StartDate = budget.StartDate;
-            this.EndDate = budget.EndDate;
         }
 
         [Required]
@@ -87,12 +133,5 @@
 
         [Required]
         public DurationType DurationType { get; set; }
-        
-        [Required]
-        [IsBeforeDate("EndDate")]
-        public DateTime StartDate { get; set; }
-
-        [Required]
-        public DateTime EndDate { get; set; }
     }
 }

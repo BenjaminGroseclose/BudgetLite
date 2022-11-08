@@ -29,7 +29,7 @@
             <MudTextField Label="Confirm Password" @bind-Value="model.ConfirmPassword"
                           For="@(() => model.ConfirmPassword)" InputType="InputType.Password" />
         </MudCardContent>
-        <MudCardActions Class="ml-auto">
+        <MudCardActions>
             <MudButton Variant="Variant.Outlined" Color="Color.Error" Class="ml-auto mr-3" Href="/">Cancel</MudButton>
             <MudButton Disabled="@isLoading" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">
                 @if (isLoading)
@@ -41,8 +41,6 @@
                     <MudText>Register</MudText>
                 }
             </MudButton>
-            
-            <!--<LoadingButton IsLoading="@isLoading" Variant="Variant.Filled" Color="Color.Success" IsSubmit="true" Text="Register" />-->
         </MudCardActions>
     </MudCard>
 

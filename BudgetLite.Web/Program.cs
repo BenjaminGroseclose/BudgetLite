@@ -1,5 +1,6 @@
 using BudgetLite.Data;
 using BudgetLite.Data.Models;
+using BudgetLite.Data.Repositories;
 using BudgetLite.Web;
 using BudgetLite.Web.Authentication;
 using Microsoft.AspNetCore.Components;
@@ -32,6 +33,9 @@ builder.Services.AddMudServices(options =>
 });
 
 // Services
+
+// Repositories
+builder.Services.AddTransient<IRepository<Budget>, BudgetRepository>();
 
 // Entity Framework & Identity
 builder.Services.AddAuthenticationCore();

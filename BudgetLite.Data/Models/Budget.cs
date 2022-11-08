@@ -28,8 +28,5 @@ namespace BudgetLite.Data.Models
         public DurationType DurationType { get; set; }
 
         public IEnumerable<BudgetPeriod> BudgetPeriods { get; set; }
-
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
     }
 }

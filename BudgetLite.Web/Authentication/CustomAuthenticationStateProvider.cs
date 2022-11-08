@@ -34,7 +34,8 @@ namespace BudgetLite.Web.Authentication
                 {
                     new Claim(ClaimTypes.Name, userSession.Username),
                     new Claim(ClaimTypes.Email, userSession.Email),
-                    new Claim(ClaimTypes.GivenName, userSession.GivenName)
+                    new Claim(ClaimTypes.GivenName, userSession.GivenName),
+                    new Claim(ClaimTypes.NameIdentifier, userSession.UserID.ToString())
                 }, "CustomAuthentication");
 
                 var claimsPrinciple = new ClaimsPrincipal(claimsIdentity);
@@ -50,7 +51,7 @@ namespace BudgetLite.Web.Authentication
 
         public async Task UpdateAuthenticationState(UserSession userSession)
         {
-            ClaimsPrincipal claimsPrincipal = null;
+            ClaimsPrincipal claimsPrincipal;
 
             if (userSession != null)
             {
@@ -60,7 +61,8 @@ namespace BudgetLite.Web.Authentication
                 {
                     new Claim(ClaimTypes.Name, userSession.Username),
                     new Claim(ClaimTypes.Email, userSession.Email),
-                    new Claim(ClaimTypes.GivenName, userSession.GivenName)
+                    new Claim(ClaimTypes.GivenName, userSession.GivenName),
+                    new Claim(ClaimTypes.NameIdentifier, userSession.UserID.ToString())
                 }, "CustomAuthentication");
 
                 claimsPrincipal = new ClaimsPrincipal(claimsIdentity);

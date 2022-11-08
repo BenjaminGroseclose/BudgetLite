@@ -2,6 +2,7 @@
 @attribute [Authorize]
 
 @inject AuthenticationStateProvider authenticationStateProvider;
+@inject IRepository<Budget> BudgetRepository
 
 <AddEditBudget Budget="null" />
 
@@ -15,5 +16,12 @@
         var authState = await this.authenticationStateProvider.GetAuthenticationStateAsync();
 
         base.OnInitializedAsync();
+
+        var budgets = this.BudgetRepository.GetAll();
+
+        if(budgets.Any())
+        {
+            
+        }
     }
 }

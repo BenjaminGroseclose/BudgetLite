@@ -50,6 +50,9 @@ namespace BudgetLite.Data.Repositories
 
         public async Task<Budget> Insert(Budget entity)
         {
+            entity.CreatedDate = DateTime.Now;
+            entity.LastModifiedDate = DateTime.Now;
+
             await this.context.Budgets.AddAsync(entity);
             await this.context.SaveChangesAsync();
 
@@ -71,6 +74,8 @@ namespace BudgetLite.Data.Repositories
             budget.Amount = entity.Amount;
             budget.ParentBudgetID = entity.ParentBudgetID;
             budget.DurationType = entity.DurationType;
+
+            budget.LastModifiedDate = DateTime.Now;
 
             this.context.Budgets.Update(budget);
             var result = await this.context.SaveChangesAsync();
