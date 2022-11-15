@@ -20,13 +20,15 @@
         </MudCardHeader>
         <MudCardContent>
             <MudTextField Label="Username" @bind-Value="model.Username" For="@(() => model.Username)" />
-            <MudTextField Label="Password" @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
-            @if(loginErrorOccured)
+            <MudTextField Label="Password" @bind-Value="model.Password" For="@(() => model.Password)"
+                InputType="InputType.Password" />
+            @if (loginErrorOccured)
             {
-                <MudText Typo="Typo.subtitle1" Color="Color.Error">Username or Password were incorrect, please try again.</MudText>
+                <MudText Typo="Typo.subtitle1" Color="Color.Error">Username or Password were incorrect, please try again.
+                </MudText>
             }
         </MudCardContent>
-        <MudCardActions >
+        <MudCardActions>
             <MudButton Variant="Variant.Outlined" Color="Color.Error" Class="ml-auto mr-3" Href="/">Cancel</MudButton>
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">
                 @if (isLoading)
@@ -52,7 +54,7 @@
     private async Task Authenticate(EditContext editContext)
     {
         isLoading = true;
-        await Task.Delay(1); // Need for loading spinner
+        await Task.Delay(1); // Needed for loading spinner
         var user = await this.userManager.FindByNameAsync(model.Username);
 
         if (user == null)
@@ -78,10 +80,10 @@
             var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)this.authenticationStateProvider;
 
             await customAuthenticationStateProvider.UpdateAuthenticationState(new UserSession(
-                user.UserName,
-                user.Email,
-                $"{user.FirstName} {user.LastName}",
-                user.Id
+            user.UserName,
+            user.Email,
+            $"{user.FirstName} {user.LastName}",
+            user.Id
             ));
 
             navigationManager.NavigateTo("/");

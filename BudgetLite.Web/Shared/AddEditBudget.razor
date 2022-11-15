@@ -3,6 +3,7 @@
 @using BudgetLite.Data;
 @using System.Security.Claims;
 
+@inject ISnackbar snackbar
 @inject IRepository<Budget> BudgetRepository
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -46,7 +47,7 @@
                 }
                 else
                 {
-                    <MudText>Save</MudText>
+                    <MudText>@(isEdit ? "Update" : "Save")</MudText>
                 }
             </MudButton>
         </MudCardActions>
@@ -58,18 +59,24 @@
     [Parameter]
     public Budget Budget { get; set; }
 
+    [Parameter]
+    public Action ReloadBudgetList { get; set;  }
+
     Model model = new Model();
     bool isLoading = false;
+    bool isEdit = false;
 
     protected override void OnInitialized()
     {
         if (Budget == null)
         {
             model = new Model();
+            isEdit = false;
         }
         else
         {
             model = new Model(Budget);
+            isEdit = true;
         }
 
         base.OnInitialized();
@@ -79,30 +86,32 @@
     {
         try
         {
+            isLoading = true;
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var currentUser = authState.User;
 
             int userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
 
             await BudgetRepository.Insert(new Budget()
-                {
-                    Name = model.Name,
-                    Description = model.Description,
-                    Catagory = model.Catagory,
-                    Amount = model.Amount,
-                    UserID = userID
-                });
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Catagory = model.Catagory,
+                Amount = model.Amount,
+                UserID = userID
+            });
+
+
+            // Empty out form
+            model = new Model();
+            ReloadBudgetList.Invoke();
         }
         catch (Exception ex)
         {
-            if (ex != null)
-            {
-
-            }
-
-            throw;
+            this.snackbar.Add($"An error occured saving the budget, please try again.", Severity.Error);
         }
 
+        isLoading = false;
     }
 
     private class Model

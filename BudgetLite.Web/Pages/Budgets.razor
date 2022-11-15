@@ -1,27 +1,39 @@
 ﻿@page "/budgets"
 @attribute [Authorize]
 
-@inject AuthenticationStateProvider authenticationStateProvider;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IRepository<Budget> BudgetRepository
 
-<AddEditBudget Budget="null" />
+<AddEditBudget Budget="null" ReloadBudgetList="Reload" />
+
+@foreach (var budget in currentBudgets)
+{
+    <BudgetListItem Budget="budget" />
+}
+
 
 <!-- List Active Budgets in last modified date order (future allow option to customize) -->
 
 @code {
     bool loading = false;
+    int userID = 0;
+    IEnumerable<Budget> currentBudgets = new List<Budget>();
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await this.authenticationStateProvider.GetAuthenticationStateAsync();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var currentUser = authState.User;
 
-        base.OnInitializedAsync();
+        userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
 
-        var budgets = this.BudgetRepository.GetAll();
+        currentBudgets = this.BudgetRepository.GetAll().Where(x => x.UserID == userID);
 
-        if(budgets.Any())
-        {
-            
-        }
+        await base.OnInitializedAsync();
+    }
+
+    public void Reload()
+    {
+        currentBudgets = this.BudgetRepository.GetAll().Where(x => x.UserID == userID);
+        this.StateHasChanged();
     }
 }
