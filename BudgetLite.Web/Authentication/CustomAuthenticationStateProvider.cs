@@ -35,7 +35,8 @@ namespace BudgetLite.Web.Authentication
                     new Claim(ClaimTypes.Name, userSession.Username),
                     new Claim(ClaimTypes.Email, userSession.Email),
                     new Claim(ClaimTypes.GivenName, userSession.GivenName),
-                    new Claim(ClaimTypes.NameIdentifier, userSession.UserID.ToString())
+                    new Claim(ClaimTypes.NameIdentifier, userSession.UserID.ToString()),
+                    new Claim(BudgetLiteClaim.Income, userSession.MonthlyIncome.ToString())
                 }, "CustomAuthentication");
 
                 var claimsPrinciple = new ClaimsPrincipal(claimsIdentity);
@@ -62,7 +63,8 @@ namespace BudgetLite.Web.Authentication
                     new Claim(ClaimTypes.Name, userSession.Username),
                     new Claim(ClaimTypes.Email, userSession.Email),
                     new Claim(ClaimTypes.GivenName, userSession.GivenName),
-                    new Claim(ClaimTypes.NameIdentifier, userSession.UserID.ToString())
+                    new Claim(ClaimTypes.NameIdentifier, userSession.UserID.ToString()),
+                    new Claim(BudgetLiteClaim.Income, userSession.MonthlyIncome.ToString())
                 }, "CustomAuthentication");
 
                 claimsPrincipal = new ClaimsPrincipal(claimsIdentity);

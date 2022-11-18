@@ -3,6 +3,7 @@ using System;
 using BudgetLite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BudgetLite.Data.Migrations
 {
     [DbContext(typeof(BudgetLiteContext))]
-    partial class BudgetLteContextModelSnapshot : ModelSnapshot
+    [Migration("20221117005654_UserIncome")]
+    partial class UserIncome
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.9");

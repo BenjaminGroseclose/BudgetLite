@@ -1,15 +1,42 @@
 ﻿@page "/budgets"
+@using BudgetLite.Data.Enums;
 @attribute [Authorize]
 
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IRepository<Budget> BudgetRepository
 
-<AddEditBudget Budget="null" ReloadBudgetList="Reload" />
+<MudExpansionPanels Style="margin: auto;">
+    <MudExpansionPanel Style="max-width: 800px;">
+        <TitleContent>
+            <div style="display: flex">
+                <MudIcon Icon="@Icons.Filled.Add" />
+                <MudText Typo="Typo.h6">Add New Budget</MudText>
+            </div>
+        </TitleContent>
+        <ChildContent>
+            <AddEditBudget Budget="null" ReloadBudgetList="Reload" />
+        </ChildContent>
+    </MudExpansionPanel>
 
-@foreach (var budget in currentBudgets)
-{
-    <BudgetListItem Budget="budget" />
-}
+    @foreach(Budget budget in currentBudgets)
+    {
+        <MudExpansionPanel Style="max-width: 800px;">
+            <TitleContent>
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="display: flex;">
+                        <MudIcon Icon="@BudgetIcon(budget.Catagory)" />
+                        <MudText Typo="Typo.h6">@budget.Name</MudText>
+                    </div>
+                    <MudIconButton Icon="@Icons.Filled.Delete" OnClick="async () => DeleteBudget(budget)" />
+                </div>
+            </TitleContent>
+            <ChildContent>
+                <BudgetCard Budget="budget" />
+            </ChildContent>
+        </MudExpansionPanel>
+    }
+
+</MudExpansionPanels>
 
 
 <!-- List Active Budgets in last modified date order (future allow option to customize) -->
@@ -29,6 +56,38 @@
         currentBudgets = this.BudgetRepository.GetAll().Where(x => x.UserID == userID);
 
         await base.OnInitializedAsync();
+    }
+
+    private string BudgetIcon(Catagory budgetCatagory)
+    {
+
+
+        switch (budgetCatagory)
+        {
+            case Catagory.MortgageOrRent:
+                return Icons.Filled.House;
+            case Catagory.Transportation:
+                return Icons.Filled.LocalShipping;
+            case Catagory.Food:
+                return Icons.Filled.Restaurant;
+            case Catagory.Utilities:
+                return Icons.Filled.Bolt;
+            case Catagory.Medical:
+                return Icons.Filled.LocalHospital;
+            case Catagory.Debt:
+                return Icons.Filled.CreditCard;
+            case Catagory.Entertainment:
+                return Icons.Filled.Movie;
+            case Catagory.Savings:
+                return Icons.Filled.Savings;
+            default:
+                return Icons.Filled.Info;
+        }
+    }
+
+    public async Task DeleteBudget(Budget budget)
+    {
+        Console.WriteLine($"Deleting Budget: {budget.Name}");
     }
 
     public void Reload()

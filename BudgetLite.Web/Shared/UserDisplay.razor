@@ -1,5 +1,7 @@
 ﻿@using BudgetLite.Web.Authentication
+
 @inject AuthenticationStateProvider authenticationStateProvider;
+@inject NavigationManager navigationManager;
 
 <AuthorizeView>
     <Authorized>
@@ -19,6 +21,7 @@
     {
         var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)this.authenticationStateProvider;
         await customAuthenticationStateProvider.UpdateAuthenticationState(null);
+        navigationManager.NavigateTo("/", forceLoad: true);
     }
 
 }
