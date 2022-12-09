@@ -36,6 +36,7 @@ builder.Services.AddMudServices(options =>
 
 // Repositories
 builder.Services.AddTransient<IRepository<Budget>, BudgetRepository>();
+builder.Services.AddTransient<IRepository<Transaction>, TransactionRepository>();
 
 // Entity Framework & Identity
 builder.Services.AddAuthenticationCore();

@@ -1,0 +1,102 @@
+﻿@using BudgetLite.Data.Enums;
+
+@inject ISnackbar snackbar
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject IRepository<Budget> BudgetRepository
+
+<MudExpansionPanel Style=@widthStyle>
+    <TitleContent>
+        <div style="display: flex; justify-content: space-between;">
+            <div style="display: flex; margin: auto 0; height: min-content;">
+                <MudIcon Class="mt-1 mr-3" Icon="@BudgetIcon(Budget.Catagory)" />
+                <MudText Typo="Typo.h6">@Budget.Name</MudText>
+                @if (doesSubBudgetTotalExceedParents)
+                {
+                    <MudIcon Class="mt-1 ml-2" Icon="@Icons.Filled.Error" Color="Color.Error" />
+                }
+            </div>
+            <MudIconButton Icon="@Icons.Filled.Delete" OnClick="async () => await DeleteBudget(Budget)" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        
+        <AddEditReadBudget Budget="Budget" ReloadBudgetList="ReloadBudgetList" />
+
+        @if (this.subBudgets.Any())
+        {
+            <MudExpansionPanels Style="margin-top: 16px">
+                @foreach (Budget subBudget in this.subBudgets)
+                {
+                    <BudgetPanel Budget="subBudget" ReloadBudgetList="ReloadBudgetList" />
+                }
+            </MudExpansionPanels>
+        }
+    </ChildContent>
+</MudExpansionPanel>
+
+@code {
+
+    [Parameter]
+    public Budget Budget { get; set; }
+
+    [Parameter]
+    public Action ReloadBudgetList { get; set; }
+
+    private string widthStyle { get; set; }
+    private IEnumerable<Budget> subBudgets { get; set; }
+    private bool doesSubBudgetTotalExceedParents;
+
+    // TODO: Create BudgetErrorModel with error message
+
+    protected override void OnInitialized()
+    {
+        widthStyle = this.Budget.ParentBudgetID == null ? "max-width: 1000px" : "max-width: 800px; margin: auto;";
+        subBudgets = this.BudgetRepository.GetAll().Where(x => x.ParentBudgetID == this.Budget.BudgetID);
+
+        if (subBudgets.Any())
+        {
+            doesSubBudgetTotalExceedParents = subBudgets.Select(x => x.Amount).Sum() > this.Budget.Amount;
+        }
+    }
+
+    public async Task DeleteBudget(Budget budget)
+    {
+        bool succeeded = await this.BudgetRepository.Delete(budget.BudgetID);
+
+        if (succeeded)
+        {
+            this.snackbar.Add($"Budget successfully deleted.", Severity.Success);
+        }
+        else
+        {
+            this.snackbar.Add($"An error occured deleting the budget, please try again.", Severity.Error);
+        }
+
+        this.ReloadBudgetList.Invoke();
+    }
+
+    private string BudgetIcon(Catagory budgetCatagory)
+    {
+        switch (budgetCatagory)
+        {
+            case Catagory.MortgageOrRent:
+                return Icons.Filled.House;
+            case Catagory.Transportation:
+                return Icons.Filled.DirectionsCar;
+            case Catagory.Food:
+                return Icons.Filled.Restaurant;
+            case Catagory.Utilities:
+                return Icons.Filled.Bolt;
+            case Catagory.Medical:
+                return Icons.Filled.LocalHospital;
+            case Catagory.Debt:
+                return Icons.Filled.CreditCard;
+            case Catagory.Entertainment:
+                return Icons.Filled.Movie;
+            case Catagory.Savings:
+                return Icons.Filled.Savings;
+            default:
+                return Icons.Filled.Info;
+        }
+    }
+}

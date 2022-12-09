@@ -1,0 +1,213 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using BudgetLite.Data.Enums
+@using BudgetLite.Data;
+@using System.Security.Claims;
+
+@inject ISnackbar snackbar
+@inject IRepository<Budget> BudgetRepository
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDialogService DialogService
+
+<EditForm Model="@model" OnValidSubmit="SaveAsync" style="max-width: 800px; margin: auto;">
+    <DataAnnotationsValidator />
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Disabled="!isEdit" Class="mt-2" Label="Budget Name" @bind-Value="model.Name" For="@(() => model.Name)" Variant="Variant.Text" />
+            <MudTextField Disabled="!isEdit" Class="mt-2" Label="Description" @bind-Value="model.Description" For="@(() => model.Description)" Variant="Variant.Outlined" Lines="2" />
+            <MudSelect Disabled="!isEdit" Class="mt-2" @bind-Value="model.Catagory" For="(() => model.Catagory)" Variant="Variant.Outlined">
+                <MudSelectItem Value="@(Catagory.MortgageOrRent)">Mortgage or Rent</MudSelectItem>
+                <MudSelectItem Value="@(Catagory.Transportation)" />
+                <MudSelectItem Value="@(Catagory.Food)" />
+                <MudSelectItem Value="@(Catagory.Utilities)" />
+                <MudSelectItem Value="@(Catagory.Medical)" />
+                <MudSelectItem Value="@(Catagory.Debt)" />
+                <MudSelectItem Value="@(Catagory.Entertainment)" />
+                <MudSelectItem Value="@(Catagory.Savings)" />
+            </MudSelect>
+            <MudTextField 
+                Class="mt-2"
+                Disabled="!isEdit"
+                Label="Amount" 
+                Variant="Variant.Outlined"
+                @bind-Value="model.Amount"
+                For="@(() => model.Amount)"
+                Adornment="Adornment.Start"
+                AdornmentColor="Color.Success"
+                AdornmentIcon="@Icons.Material.Filled.AttachMoney">
+            </MudTextField>
+            <MudRadioGroup Class="mt-2" T="DurationType" @bind-SelectedOption="model.DurationType">
+                <MudRadio Disabled="!isEdit" Option="@(DurationType.WEEKLY)">Weekly</MudRadio>
+                <MudRadio Disabled="!isEdit" Option="@(DurationType.MONTHLY)">Monthly</MudRadio>
+                <MudRadio Disabled="!isEdit" Option="@(DurationType.QUARTERLY)">Quarterly</MudRadio>
+                <MudRadio Disabled="!isEdit" Option="@(DurationType.YEARLY)">Yearly</MudRadio>
+            </MudRadioGroup>
+        </MudCardContent>
+        <MudCardActions>
+            <div class="ml-auto">
+                @if (isEdit == false)
+                {
+                    <MudButton OnClick="AddSubBudget" Color="Color.Secondary">
+                        <MudIcon Icon="@Icons.Filled.Add" />
+                        Add Sub Budget
+                    </MudButton>
+                    <MudButton Class="ml-2" OnClick="() => isEdit = true" Color="Color.Primary">Edit</MudButton>
+                }
+                else
+                {
+                    @if (Budget != null)
+                    {
+                        <MudButton OnClick="() => isEdit = false" Color="Color.Error">Cancel</MudButton>
+                    }
+                    <MudButton Class="ml-2" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">
+                        @if (isLoading)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        }
+                        else
+                        {
+                            <MudText>@(Budget != null ? "Update" : "Save")</MudText>
+                        }
+                    </MudButton>
+                }
+            </div>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public Budget Budget { get; set; }
+
+    [Parameter]
+    public Action ReloadBudgetList { get; set;  }
+
+    Model model = new Model();
+    bool isLoading = false;
+    bool isEdit = false;
+
+    protected override void OnInitialized()
+    {
+        if (Budget == null)
+        {
+            model = new Model();
+            isEdit = true;
+        }
+        else
+        {
+            model = new Model(Budget);
+        }
+
+        base.OnInitialized();
+    }
+
+    public async Task SaveAsync()
+    {
+        try
+        {
+            isLoading = true;
+            int userID = 0;
+
+            if (!isEdit)
+            {
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var currentUser = authState.User;
+
+                userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+            }
+            else
+            {
+                userID = Budget.UserID;
+            }
+
+
+            if (isEdit)
+            {
+                await BudgetRepository.Update(this.Budget.BudgetID, new Budget()
+                {
+                    Name = model.Name,
+                    Description = model.Description,
+                    Catagory = model.Catagory,
+                    Amount = model.Amount,
+                    UserID = userID,
+                    DurationType = model.DurationType,
+                    ParentBudgetID = this.Budget.ParentBudgetID
+                });
+            }
+            else
+            {
+                await BudgetRepository.Insert(new Budget()
+                {
+                    Name = model.Name,
+                    Description = model.Description,
+                    Catagory = model.Catagory,
+                    Amount = model.Amount,
+                    UserID = userID,
+                    DurationType = model.DurationType
+                });
+            }
+
+            // Empty out form
+            if (!isEdit)
+            {
+                model = new Model();
+            }
+            else
+            {
+                isEdit = false;
+            }
+
+            this.snackbar.Add($"Successfully {(isEdit ? "updated" : "saved")} the {model.Name} budget.", Severity.Success);
+            ReloadBudgetList.Invoke();
+        }
+        catch (Exception)
+        {
+            this.snackbar.Add("An error occured saving the budget, please try again.", Severity.Error);
+        }
+
+        isLoading = false;
+    }
+
+    private async Task AddSubBudget()
+    {
+        var parameters = new DialogParameters { ["parentBudget"] = Budget, };
+
+        var dialog = this.DialogService.Show<AddSubBudget>("Add Sub Budget", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            ReloadBudgetList.Invoke();
+        }
+    }
+
+    private class Model
+    {
+        public Model() { }
+
+        public Model(Budget budget)
+        {
+            this.Name = budget.Name;
+            this.Description = budget.Description;
+            this.Catagory = budget.Catagory;
+            this.Amount = budget.Amount;
+            this.DurationType = budget.DurationType;
+        }
+
+        [Required]
+        [MaxLength(80)]
+        public string Name { get; set; }
+
+        [MaxLength(1000)]
+        public string Description { get; set; }
+
+        public Catagory Catagory { get; set; }
+
+        [Required]
+        [Range(0.0, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]
+        public double Amount { get; set; }
+
+        [Required]
+        public DurationType DurationType { get; set; }
+    }
+}

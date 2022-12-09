@@ -1,0 +1,85 @@
+﻿@page "/transactions"
+@attribute [Authorize]
+
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject IRepository<Transaction> TransactionRepository
+@inject IDialogService DialogService
+
+<MudButton OnClick="OpenAddTransactionDialog" Class="mb-3" Variant="Variant.Outlined" Color="Color.Primary">
+    <MudIcon Icon="@Icons.Filled.Add" />
+    Transaction
+</MudButton>
+
+<MudTable Items="@transactions" SelectedItem="selectedTransaction" Hover="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Transactions</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>ID</MudTh>
+        <MudTh>Budget Name</MudTh>
+        <MudTh>Amount</MudTh>
+        <MudTh>Catagory</MudTh>
+        <MudTh>Date</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="ID">@context.TransactionID</MudTd>
+        <MudTd DataLabel="Budget Name">@context.BudgetPeriod.Budget.Name</MudTd>
+        <MudTd DataLabel="Amount">@context.Amount</MudTd>
+        <MudTd DataLabel="Catagory">@context.Catagory</MudTd>
+        <MudTd DataLabel="Date">@context.Date</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    string searchString = "";
+    int userID = 0;
+    IEnumerable<Transaction> transactions = new List<Transaction>();
+    Transaction selectedTransaction;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var currentUser = authState.User;
+
+        userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+
+        transactions = this.TransactionRepository.GetAll().Where(x => x.UserID == userID).OrderByDescending(x => x.Date);
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OpenAddTransactionDialog()
+    {
+        var parameters = new DialogParameters { ["userID"] = userID };
+
+        var dialog = this.DialogService.Show<AddTransaction>("Add Transaction", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            // Save
+        }
+    }
+
+    private bool FilterFunc1(Transaction element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(Transaction element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.BudgetPeriod.Budget.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Catagory.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Notes.Contains(searchString))
+            return true;
+        return false;
+    }
+
+    public async Task AddTransaction()
+    {
+        
+    }
+}

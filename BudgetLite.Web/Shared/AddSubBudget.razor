@@ -1,19 +1,24 @@
-﻿@using System.ComponentModel.DataAnnotations
-@using BudgetLite.Data.Enums
-@using BudgetLite.Data;
-@using System.Security.Claims;
+﻿@using System.ComponentModel.DataAnnotations;
+@using BudgetLite.Data.Enums;
 
 @inject ISnackbar snackbar
 @inject IRepository<Budget> BudgetRepository
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<EditForm Model="@model" OnValidSubmit="SaveAsync" style="max-width: 800px; margin: auto;">
+<EditForm Model="@model" OnValidSubmit="SaveAsync">
     <DataAnnotationsValidator />
-    <MudCard>
-        <MudCardContent>
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Class="mr-3 mb-n1" />
+                Add Sub Budget
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudDivider />
             <MudTextField Class="mt-2" Label="Budget Name" @bind-Value="model.Name" For="@(() => model.Name)" Variant="Variant.Text" />
             <MudTextField Class="mt-2" Label="Description" @bind-Value="model.Description" For="@(() => model.Description)" Variant="Variant.Outlined" Lines="2" />
-            <MudSelect Class="mt-2" @bind-bind-Valu="model.Catagory" For="(() => model.Catagory)" Variant="Variant.Outlined">
+            <MudSelect Disabled=true Class="mt-2" @bind-Value="model.Catagory" For="(() => model.Catagory)" Variant="Variant.Outlined">
                 <MudSelectItem Value="@(Catagory.MortgageOrRent)">Mortgage or Rent</MudSelectItem>
                 <MudSelectItem Value="@(Catagory.Transportation)" />
                 <MudSelectItem Value="@(Catagory.Food)" />
@@ -32,54 +37,47 @@
                 AdornmentColor="Color.Success"
                 AdornmentIcon="@Icons.Material.Filled.AttachMoney">
             </MudTextField>
-            <MudRadioGroup Class="mt-2" T="DurationType" @bind-bind-SelectedOption="model.DurationType">
-                <MudRadio Option="@(DurationType.WEEKLY)">Weekly</MudRadio>
-                <MudRadio Option="@(DurationType.MONTHLY)">Monthly</MudRadio>
-                <MudRadio Option="@(DurationType.QUARTERLY)">Quarterly</MudRadio>
-                <MudRadio Option="@(DurationType.YEARLY)">Yearly</MudRadio>
+            <MudRadioGroup Class="mt-2" T="DurationType" @bind-SelectedOption="model.DurationType">
+                <MudRadio Disabled=true Option="@(DurationType.WEEKLY)">Weekly</MudRadio>
+                <MudRadio Disabled=true Option="@(DurationType.MONTHLY)">Monthly</MudRadio>
+                <MudRadio Disabled=true Option="@(DurationType.QUARTERLY)">Quarterly</MudRadio>
+                <MudRadio Disabled=true Option="@(DurationType.YEARLY)">Yearly</MudRadio>
             </MudRadioGroup>
-        </MudCardContent>
-        <MudCardActions>
-            <MudButton Class="ml-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">
+        </DialogContent>
+        <DialogActions>
+            <MudButton Class="ml-auto" Variant="Variant.Outlined" Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">
                 @if (isLoading)
                 {
                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
                 }
                 else
                 {
-                    <MudText>@(isEdit ? "Update" : "Save")</MudText>
+                    <MudText>Save</MudText>
                 }
             </MudButton>
-        </MudCardActions>
-    </MudCard>
+        </DialogActions>
+    </MudDialog>
 </EditForm>
 
 @code {
-
-    [Parameter]
-    public Budget Budget { get; set; }
-
-    [Parameter]
-    public Action ReloadBudgetList { get; set;  }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Budget parentBudget { get; set; }
 
     Model model = new Model();
     bool isLoading = false;
-    bool isEdit = false;
 
-    protected override void OnInitialized()
+    protected override void OnAfterRender(bool firstRender)
     {
-        if (Budget == null)
-        {
-            model = new Model();
-            isEdit = false;
-        }
-        else
-        {
-            model = new Model(Budget);
-            isEdit = true;
-        }
+        model.Catagory = parentBudget.Catagory;
+        model.DurationType = parentBudget.DurationType;
+        this.StateHasChanged();
+        base.OnAfterRender(firstRender);
+    }
 
-        base.OnInitialized();
+    public void Cancel()
+    {
+        MudDialog.Cancel();
     }
 
     public async Task SaveAsync()
@@ -98,15 +96,14 @@
                 Description = model.Description,
                 Catagory = model.Catagory,
                 Amount = model.Amount,
-                UserID = userID
+                UserID = userID,
+                ParentBudgetID = parentBudget.BudgetID
             });
 
-
-            // Empty out form
-            model = new Model();
-            ReloadBudgetList.Invoke();
+            this.snackbar.Add("Successfully added the sub budget.", Severity.Success);
+            MudDialog.Close();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             this.snackbar.Add($"An error occured saving the budget, please try again.", Severity.Error);
         }
