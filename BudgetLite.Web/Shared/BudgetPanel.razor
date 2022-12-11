@@ -27,7 +27,7 @@
             <MudExpansionPanels Style="margin-top: 16px">
                 @foreach (Budget subBudget in this.subBudgets)
                 {
-                    <BudgetPanel Budget="subBudget" ReloadBudgetList="ReloadBudgetList" />
+                    <BudgetPanel Budget="subBudget" ReloadBudgetList="SubBudgetReload" />
                 }
             </MudExpansionPanels>
         }
@@ -57,6 +57,18 @@
         {
             doesSubBudgetTotalExceedParents = subBudgets.Select(x => x.Amount).Sum() > this.Budget.Amount;
         }
+    }
+
+    public void SubBudgetReload()
+    {
+        subBudgets = this.BudgetRepository.GetAll().Where(x => x.ParentBudgetID == this.Budget.BudgetID);
+
+        if (subBudgets.Any())
+        {
+            doesSubBudgetTotalExceedParents = subBudgets.Select(x => x.Amount).Sum() > this.Budget.Amount;
+        }
+
+        this.ReloadBudgetList.Invoke();
     }
 
     public async Task DeleteBudget(Budget budget)

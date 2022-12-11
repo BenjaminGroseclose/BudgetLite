@@ -5,8 +5,15 @@
 
 <AuthorizeView>
     <Authorized>
-        <MudText Typo="Typo.subtitle1" Class="mr-3">@context.User.Identity?.Name</MudText>
-        <MudButton Variant="Variant.Text" StartIcon="@Icons.Filled.Logout" Color="Color.Inherit" OnClick="Logout">Logout</MudButton>
+        <MudMenu ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+            <ActivatorContent>
+                <MudAvatar Color="Color.Secondary" Class="mr-3">@context.User.Identity?.Name?.Substring(0,1).ToUpper()</MudAvatar>
+            </ActivatorContent>
+            <ChildContent>
+                <MudMenuItem Href="profile">Profile</MudMenuItem>
+                <MudMenuItem Color="Color.Inherit" OnClick="Logout">Logout</MudMenuItem>
+            </ChildContent>
+        </MudMenu>
     </Authorized>
     <NotAuthorized>
         <MudButton Class="mr-3" Variant="Variant.Text" StartIcon="@Icons.Filled.Login" Color="Color.Inherit" Href="login">Login</MudButton>

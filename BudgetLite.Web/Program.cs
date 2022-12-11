@@ -1,12 +1,9 @@
 using BudgetLite.Data;
 using BudgetLite.Data.Models;
 using BudgetLite.Data.Repositories;
-using BudgetLite.Web;
 using BudgetLite.Web.Authentication;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

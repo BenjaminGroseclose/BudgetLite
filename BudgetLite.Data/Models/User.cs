@@ -22,5 +22,20 @@ namespace BudgetLite.Data.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public decimal MonthlyIncome { get; set; }
+
+        public decimal WeeklyIncome()
+        {
+            return this.MonthlyIncome / 4;
+        }
+
+        public decimal YearlyIncome()
+        {
+            return this.MonthlyIncome * 12;
+        }
+
+        public decimal QuarterlyIncome()
+        {
+            return this.MonthlyIncome * 3;
+        }
     }
 }

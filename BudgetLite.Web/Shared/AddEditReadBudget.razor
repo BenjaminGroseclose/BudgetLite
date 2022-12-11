@@ -108,7 +108,7 @@
             isLoading = true;
             int userID = 0;
 
-            if (!isEdit)
+            if (this.Budget == null)
             {
                 var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 var currentUser = authState.User;
@@ -121,7 +121,7 @@
             }
 
 
-            if (isEdit)
+            if (this.Budget != null)
             {
                 await BudgetRepository.Update(this.Budget.BudgetID, new Budget()
                 {
