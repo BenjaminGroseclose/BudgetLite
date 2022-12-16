@@ -106,6 +106,7 @@
         try
         {
             isLoading = true;
+            await Task.Delay(1); // Needed for loading spinner
             int userID = 0;
 
             if (this.Budget == null)

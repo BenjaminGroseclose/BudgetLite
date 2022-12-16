@@ -43,6 +43,11 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var currentUser = authState.User;
 
+        if (currentUser.Claims.Any() == false)
+        {
+            return;
+        }
+
         userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
 
         transactions = this.TransactionRepository.GetAll().Where(x => x.UserID == userID).OrderByDescending(x => x.Date);

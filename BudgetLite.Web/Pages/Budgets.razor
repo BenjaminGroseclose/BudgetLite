@@ -2,8 +2,8 @@
 @using BudgetLite.Data.Enums;
 @attribute [Authorize]
 
-@inject AuthenticationStateProvider AuthenticationStateProvider;
-@inject IRepository<Budget> BudgetRepository
+@inject AuthenticationStateProvider authenticationStateProvider;
+@inject IRepository<Budget> budgetRepository
 
 <!-- TODO: Add Filters -->
 <MudExpansionPanels Style="margin: auto;">
@@ -36,19 +36,24 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var currentUser = authState.User;
+
+        if (currentUser.Claims.Any() == false)
+        {
+            return;
+        }
 
         userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
 
-        rootBudgets = this.BudgetRepository.GetAll().Where(x => x.UserID == userID && x.ParentBudgetID == null);
+        rootBudgets = this.budgetRepository.GetAll().Where(x => x.UserID == userID && x.ParentBudgetID == null);
 
         await base.OnInitializedAsync();
     }
 
     public void Reload()
     {
-        rootBudgets = this.BudgetRepository.GetAll().Where(x => x.UserID == userID && x.ParentBudgetID == null);
+        rootBudgets = this.budgetRepository.GetAll().Where(x => x.UserID == userID && x.ParentBudgetID == null);
         this.StateHasChanged();
     }
 }
