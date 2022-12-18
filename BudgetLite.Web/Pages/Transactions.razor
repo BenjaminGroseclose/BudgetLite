@@ -57,9 +57,9 @@
 
     private async Task OpenAddTransactionDialog()
     {
-        var parameters = new DialogParameters { ["userID"] = userID };
+        var parameters = new DialogParameters { ["UserID"] = userID, ["Transaction"] = null };
 
-        var dialog = this.DialogService.Show<AddTransaction>("Add Transaction", parameters);
+        var dialog = this.DialogService.Show<AddUpdateTransaction>("Add Transaction", parameters);
         var result = await dialog.Result;
 
         if (!result.Cancelled)

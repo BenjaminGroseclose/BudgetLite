@@ -16,7 +16,8 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public int userID { get; set; }
+    [Parameter] public int UserID { get; set; }
+    [Parameter] public Transaction Transaction { get; set; }
 
     public void Cancel()
     {

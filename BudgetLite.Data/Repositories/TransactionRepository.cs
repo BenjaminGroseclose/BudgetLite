@@ -62,7 +62,7 @@ namespace BudgetLite.Data.Repositories
 
         public async Task<Transaction> Update(int id, Transaction entity)
         {
-            Transaction transaction = await this.context.Transactions.FindAsync(id);
+            Transaction? transaction = await this.context.Transactions.FindAsync(id);
 
             if (transaction == null)
             {

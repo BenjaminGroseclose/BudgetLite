@@ -59,6 +59,13 @@
                 <MudText Typo="Typo.h6">Change Password</MudText>
             </MudCardHeader>
             <MudCardContent>
+                @if (passwordErrors.Any())
+                {
+                    @foreach(string error in passwordErrors)
+                    {
+                        <MudText Color="Color.Error" Typo="Typo.body2">@error</MudText>
+                    }
+                }
                 <MudTextField Label="Password" @bind-Value="passwordModel.OldPassword" For="@(() => passwordModel.OldPassword)"
                               InputType="InputType.Password" />
                 <MudTextField Label="Password" @bind-Value="passwordModel.NewPassword" For="@(() => passwordModel.NewPassword)"
@@ -84,7 +91,8 @@
     Model model = new Model();
     PasswordModel passwordModel = new PasswordModel();
     User? user;
-    List<string> errors = new List<string>();
+    IEnumerable<string> errors = new List<string>();
+    IEnumerable<string> passwordErrors = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -115,15 +123,25 @@
         var dialog = this.dialogService.Show<ConfirmPasswordUpdate>("Confirm Password Update");
         var result = await dialog.Result;
 
-        if (!result.Cancelled)
+        if (!result.Cancelled && this.user != null)
         {
-            // Save
+            var changePasswordResult = await this.userManager.ChangePasswordAsync(this.user, this.passwordModel.OldPassword, this.passwordModel.NewPassword);
+
+            if (changePasswordResult.Succeeded)
+            {
+                this.snackbar.Add($"Successfully updated {this.user.UserName}'s password.", Severity.Success);
+                this.passwordErrors = new List<string>();
+            }
+            else
+            {
+                this.passwordErrors = changePasswordResult.Errors.Select(x => x.Description);
+            }
         }
     }
 
     public void DeleteAccount()
     {
-        
+        // TODO
     }
 
     public async Task SaveAsync()

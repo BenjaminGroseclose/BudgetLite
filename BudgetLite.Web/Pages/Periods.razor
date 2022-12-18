@@ -1,0 +1,47 @@
+﻿@page "/periods"
+@attribute [Authorize]
+
+@inject AuthenticationStateProvider authenticationStateProvider;
+@inject IRepository<BudgetPeriod> budgetPeriodRepository
+
+<MudText Typo="Typo.h6">Periods</MudText>
+<MudText Typo="Typo.caption">
+    Budget periods are process automatically behind the scenes. When a transaction is created against a budget we 
+    automatically assign that transaction to a budget period based on the date of the transaction.
+</MudText>
+
+<MudRadioGroup Class="mt-2" T="DurationType" SelectedOptionChanged="LoadBudgetPeriodForDuration">
+    <MudRadio Option="@(DurationType.WEEKLY)">Weekly</MudRadio>
+    <MudRadio Option="@(DurationType.MONTHLY)">Monthly</MudRadio>
+    <MudRadio Option="@(DurationType.QUARTERLY)">Quarterly</MudRadio>
+    <MudRadio Option="@(DurationType.YEARLY)">Yearly</MudRadio>
+</MudRadioGroup>
+
+
+@code {
+    bool loading = false;
+    int userID = 0;
+    IEnumerable<BudgetPeriod> budgetsPeriods = new List<BudgetPeriod>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var currentUser = authState.User;
+
+        if (currentUser.Claims.Any() == false)
+        {
+            return;
+        }
+
+        userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+
+        this.LoadBudgetPeriodForDuration(DurationType.WEEKLY);
+
+        await base.OnInitializedAsync();
+    }
+
+    private void LoadBudgetPeriodForDuration(DurationType durationType)
+    {
+        this.budgetsPeriods = this.budgetPeriodRepository.GetAll().Where(x => x.Budget.UserID == userID && x.DurationType == durationType);
+    }
+}

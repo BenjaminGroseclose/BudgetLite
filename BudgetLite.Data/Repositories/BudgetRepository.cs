@@ -14,7 +14,7 @@ namespace BudgetLite.Data.Repositories
 
         public async Task<bool> Delete(int id)
         {
-            Budget budget = await this.context.Budgets.FindAsync(id);
+            Budget? budget = await this.context.Budgets.FindAsync(id);
 
             if (budget == null)
             {
@@ -34,7 +34,7 @@ namespace BudgetLite.Data.Repositories
 
         public async Task<Budget> Get(int id)
         {
-            Budget budget = await this.context.Budgets.FindAsync(id);
+            Budget? budget = await this.context.Budgets.FindAsync(id);
 
             if (budget == null)
             {
