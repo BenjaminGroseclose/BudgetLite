@@ -17,6 +17,8 @@ namespace BudgetLite.Data.Models
         public int BudgetID { get; set; }
         public Budget Budget { get; set; }
 
+        public double BudgetAmount { get; set; }
+
         public IEnumerable<Transaction> Transactions { get; set; }
 
         public double AmountSpent { get { return this.Transactions.Select(x => x.Amount).Sum(); } }

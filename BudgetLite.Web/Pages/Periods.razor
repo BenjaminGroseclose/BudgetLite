@@ -11,12 +11,28 @@
 </MudText>
 
 <MudRadioGroup Class="mt-2" T="DurationType" SelectedOptionChanged="LoadBudgetPeriodForDuration">
-    <MudRadio Option="@(DurationType.WEEKLY)">Weekly</MudRadio>
+    <!--<MudRadio Option="@(DurationType.WEEKLY)">Weekly</MudRadio> -->
     <MudRadio Option="@(DurationType.MONTHLY)">Monthly</MudRadio>
     <MudRadio Option="@(DurationType.QUARTERLY)">Quarterly</MudRadio>
     <MudRadio Option="@(DurationType.YEARLY)">Yearly</MudRadio>
 </MudRadioGroup>
 
+@foreach(BudgetPeriod budgetPeriod in this.budgetsPeriods)
+{
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">@budgetPeriod.Budget.Name @budgetPeriod.StartDate - @budgetPeriod.EndDate</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            @budgetPeriod.AmountSpent
+            <MudProgressLinear Rounded="true" Color="Color.Primary" Min="0" Max="budgetPeriod.BudgetAmount" Value="budgetPeriod.AmountSpent" />
+            @budgetPeriod.BudgetAmount
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton>View Transactions</MudButton>
+        </MudCardActions>
+    </MudCard>
+}
 
 @code {
     bool loading = false;
@@ -35,13 +51,17 @@
 
         userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
 
-        this.LoadBudgetPeriodForDuration(DurationType.WEEKLY);
+        this.LoadBudgetPeriodForDuration(DurationType.MONTHLY);
 
         await base.OnInitializedAsync();
     }
 
     private void LoadBudgetPeriodForDuration(DurationType durationType)
     {
-        this.budgetsPeriods = this.budgetPeriodRepository.GetAll().Where(x => x.Budget.UserID == userID && x.DurationType == durationType);
+        this.budgetsPeriods = this.budgetPeriodRepository
+            .GetAll()
+            .Where(x => x.Budget.UserID == userID && 
+                   x.DurationType == durationType &&
+                   DateTime.Today.Between(x.StartDate, x.EndDate));
     }
 }
