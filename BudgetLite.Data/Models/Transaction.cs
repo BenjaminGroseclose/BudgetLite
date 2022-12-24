@@ -13,7 +13,7 @@ namespace BudgetLite.Data.Models
         public double Amount { get; set; }
         public DateTime Date { get; set; }
         public Catagory Catagory { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         public int UserID { get; set; }
 
         [ForeignKey(nameof(UserID))]

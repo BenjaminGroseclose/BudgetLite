@@ -63,5 +63,10 @@
             .Where(x => x.Budget.UserID == userID && 
                    x.DurationType == durationType &&
                    DateTime.Today.Between(x.StartDate, x.EndDate));
+
+        if (this.budgetsPeriods == null)
+        {
+            
+        }
     }
 }

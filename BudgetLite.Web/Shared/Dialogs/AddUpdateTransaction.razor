@@ -1,26 +1,117 @@
-﻿<MudDialog>
-    <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.CurrencyExchange" Class="mr-3 mb-n1"/>
-            Add Transaction
-        </MudText>
-    </TitleContent>
-    <DialogContent>
+﻿@inject IRepository<Budget> budgetRepository;
 
-    </DialogContent>
-    <DialogActions>
-        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Success">Save</MudButton>
-    </DialogActions>
-</MudDialog>
+<EditForm Model="@model" OnValidSubmit="Save">
+    <DataAnnotationsValidator />
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.CurrencyExchange" Class="mr-3 mb-n1"/>
+                Add Transaction
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudTextField 
+                Class="mt-2"
+                Label="Amount"
+                Variant="Variant.Outlined"
+                @bind-Value="model.Amount"
+                For="@(() => model.Amount)"
+                Adornment="Adornment.Start"
+                AdornmentColor="Color.Success"
+                AdornmentIcon="@Icons.Material.Filled.AttachMoney">
+            </MudTextField>
+            <MudDatePicker Class="mt-2"
+                Label="Transaction Date"
+                @bind-Date="model.Date"
+                For="@(() => model.Date)"
+                AutoClose="true"
+                Variant="Variant.Outlined">
+            </MudDatePicker>
+            <MudSelect Class="mt-2" Label="Budget" Variant="Variant.Outlined" @bind-Value="model.BudgetID" For="@(() => model.BudgetID)">
+                <MudSelectItem Value="0">Select a Budget...</MudSelectItem>
+                @foreach(var budget in this.Budgets)
+                {
+                    <MudSelectItem Value="budget.BudgetID">@budget.Name</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField
+                Class="mt-2"
+                Label="Notes"
+                @bind-Value="model.Notes"
+                For="@(() => model.Notes)"
+                Variant="Variant.Outlined" 
+                Lines="2">
+            </MudTextField>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Save</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public int UserID { get; set; }
     [Parameter] public Transaction Transaction { get; set; }
 
+    AddUpdateTransactionModel model = null;
+    IEnumerable<Budget> Budgets = new List<Budget>();
+
+    protected override void OnInitialized()
+    {
+        if (Transaction == null)
+        {
+            model = new AddUpdateTransactionModel();
+        }
+        else
+        {
+            model = new AddUpdateTransactionModel(Transaction);
+        }
+
+        this.Budgets = this.budgetRepository.GetAll().Where(x => x.UserID == this.UserID);
+        base.OnInitialized();
+    }
+
+    public void Save()
+    {
+        var selectedBudget = this.Budgets.First(x => x.BudgetID == this.model.BudgetID);
+
+        this.model.DurationType = selectedBudget.DurationType;
+        this.model.BudgetAmount = selectedBudget.Amount;
+        this.model.Catagory = selectedBudget.Catagory;
+        MudDialog.Close(this.model);
+    }
+
     public void Cancel()
     {
         MudDialog.Cancel();
+    }
+
+    public class AddUpdateTransactionModel
+    {
+        public AddUpdateTransactionModel() { }
+
+        public AddUpdateTransactionModel(Transaction transaction)
+        {
+
+        }
+
+        [Required]
+        [Range(0.1, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]
+        public double Amount { get; set; }
+
+        [Required]
+        [IsPastDate]
+        public DateTime? Date { get; set; }
+
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Must select a Budget")]
+        public int BudgetID { get; set; }
+
+        public string Notes { get; set; }
+        public DurationType DurationType { get; set; }
+        public double BudgetAmount { get; set; }
+        public Catagory Catagory { get; set;  }
     }
 }

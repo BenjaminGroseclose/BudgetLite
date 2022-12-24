@@ -1,15 +1,17 @@
 ﻿@page "/transactions"
+@using static BudgetLite.Web.Shared.Dialogs.AddUpdateTransaction;
 @attribute [Authorize]
 
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IRepository<Transaction> TransactionRepository
+@inject IRepository<BudgetPeriod> BudgetPeriodRepository
 @inject IDialogService DialogService
 
 <MudButton OnClick="OpenAddTransactionDialog" Class="mb-3" Variant="Variant.Outlined" Color="Color.Primary">
     <MudIcon Icon="@Icons.Filled.Add" />
     Transaction
 </MudButton>
-
+<!-- TODO: Add date to pull transaction between -->
 <MudTable Items="@transactions" SelectedItem="selectedTransaction" Hover="true">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Transactions</MudText>
@@ -64,7 +66,8 @@
 
         if (!result.Cancelled)
         {
-            // Save
+            AddUpdateTransactionModel data = (AddUpdateTransactionModel)result.Data;
+            await AddTransaction(data);
         }
     }
 
@@ -83,8 +86,43 @@
         return false;
     }
 
-    public async Task AddTransaction()
+    private async Task AddTransaction(AddUpdateTransactionModel data)
     {
-        
+        if (data == null)
+        {
+            throw new ArgumentNullException("Data cannot be null");
+        }
+
+        BudgetPeriod? bugetPeriod = this.BudgetPeriodRepository.GetAll().FirstOrDefault(x =>
+            x.BudgetID == data.BudgetID &&
+            x.StartDate <= data.Date &&
+            x.EndDate >= data.Date
+        );
+
+        DateTime transactionDate = data.Date.Value;
+
+        if (bugetPeriod == null)
+        {
+            int endOfMonth = DateTime.DaysInMonth(transactionDate.Year, transactionDate.Month);
+
+            bugetPeriod = await this.BudgetPeriodRepository.Insert(new BudgetPeriod
+            {
+                BudgetID = data.BudgetID,
+                DurationType = data.DurationType,
+                BudgetAmount = data.BudgetAmount,
+                StartDate = new DateTime(month: transactionDate.Month, day: 1, year: transactionDate.Year),
+                EndDate = new DateTime(month: transactionDate.Month, day: endOfMonth, year: transactionDate.Year)
+            });
+        }
+
+        var insertedTransaction = await this.TransactionRepository.Insert(new Transaction
+        {
+            BudgetPeriodID = bugetPeriod.BudgetPeriodID,
+            Amount = data.Amount,
+            Date = transactionDate,
+            Notes = data.Notes,
+            Catagory = data.Catagory,
+            UserID = this.userID
+        });
     }
 }
