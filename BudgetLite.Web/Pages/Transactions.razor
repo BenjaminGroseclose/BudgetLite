@@ -7,30 +7,42 @@
 @inject IRepository<BudgetPeriod> BudgetPeriodRepository
 @inject IDialogService DialogService
 
-<MudButton OnClick="OpenAddTransactionDialog" Class="mb-3" Variant="Variant.Outlined" Color="Color.Primary">
-    <MudIcon Icon="@Icons.Filled.Add" />
-    Transaction
-</MudButton>
+<div>
+    <MudButton OnClick="OpenAddTransactionDialog" Class="mb-3" Variant="Variant.Outlined" Color="Color.Primary">
+        <MudIcon Icon="@Icons.Filled.Add" />
+        Transaction
+    </MudButton>
+    <MudDatePicker
+        Class="ml-auto"
+        Label="Start Date"
+        AutoClose="true"
+        />
+    <MudDatePicker
+        Class="ml-auto"
+        Label="End Date"
+        AutoClose="true"
+        />
+</div>
 <!-- TODO: Add date to pull transaction between -->
-<MudTable Items="@transactions" SelectedItem="selectedTransaction" Hover="true">
+<MudTable Items="@transactions" SelectedItem="selectedTransaction" Hover="true" Filter="new Func<Transaction,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Transactions</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>ID</MudTh>
         <MudTh>Budget Name</MudTh>
         <MudTh>Amount</MudTh>
         <MudTh>Catagory</MudTh>
         <MudTh>Date</MudTh>
+        <MudTh>Notes</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="ID">@context.TransactionID</MudTd>
         <MudTd DataLabel="Budget Name">@context.BudgetPeriod.Budget.Name</MudTd>
-        <MudTd DataLabel="Amount">@context.Amount</MudTd>
+        <MudTd DataLabel="Amount">$ @context.Amount</MudTd>
         <MudTd DataLabel="Catagory">@context.Catagory</MudTd>
-        <MudTd DataLabel="Date">@context.Date</MudTd>
+        <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
+        <MudTh DataLabel="Notes">@context.Notes</MudTh>
     </RowTemplate>
 </MudTable>
 
@@ -81,7 +93,9 @@
             return true;
         if (element.Catagory.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.Notes.Contains(searchString))
+        if (element.Notes != null && element.Notes.Contains(searchString))
+            return true;
+        if (element.Date.ToShortDateString().Contains(searchString))
             return true;
         return false;
     }

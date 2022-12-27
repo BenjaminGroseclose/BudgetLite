@@ -2,7 +2,7 @@
 {
     public enum Catagory
     {
-        MortgageOrRent,
+        Home,
         Transportation,
         Food,
         Utilities,

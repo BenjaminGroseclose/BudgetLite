@@ -9,7 +9,7 @@
     Budget periods are process automatically behind the scenes. When a transaction is created against a budget we 
     automatically assign that transaction to a budget period based on the date of the transaction.
 </MudText>
-
+<!-- TODO: Add Datepicker -->
 <MudRadioGroup Class="mt-2" T="DurationType" SelectedOptionChanged="LoadBudgetPeriodForDuration">
     <!--<MudRadio Option="@(DurationType.WEEKLY)">Weekly</MudRadio> -->
     <MudRadio Option="@(DurationType.MONTHLY)">Monthly</MudRadio>
@@ -21,15 +21,18 @@
 {
     <MudCard>
         <MudCardHeader>
-            <MudText Typo="Typo.h6">@budgetPeriod.Budget.Name @budgetPeriod.StartDate - @budgetPeriod.EndDate</MudText>
+            <MudIcon Class="mt-1 mr-3" Icon="@Helpers.BudgetIcon(budgetPeriod.Budget.Catagory)" />
+            <MudText Typo="Typo.h6">@budgetPeriod.Budget.Name @budgetPeriod.StartDate.ToShortDateString() - @budgetPeriod.EndDate.ToShortDateString()</MudText>
         </MudCardHeader>
         <MudCardContent>
-            @budgetPeriod.AmountSpent
-            <MudProgressLinear Rounded="true" Color="Color.Primary" Min="0" Max="budgetPeriod.BudgetAmount" Value="budgetPeriod.AmountSpent" />
-            @budgetPeriod.BudgetAmount
+            <MudProgressLinear Size="Size.Medium" Rounded="true" Color="PeriodColor(budgetPeriod.AmountSpent, budgetPeriod.BudgetAmount)" Min="0" Max="budgetPeriod.BudgetAmount" Value="budgetPeriod.AmountSpent">
+                <MudText Typo="Typo.subtitle1" Color="PeriodColor(budgetPeriod.AmountSpent, budgetPeriod.BudgetAmount)" Class="mb-6">
+                    <b>@CalcPercentage(budgetPeriod.AmountSpent, budgetPeriod.BudgetAmount)</b>
+                </MudText>
+            </MudProgressLinear>
         </MudCardContent>
         <MudCardActions>
-            <MudButton>View Transactions</MudButton>
+            <MudButton Color="Color.Primary" Variant="Variant.Outlined">View Transactions</MudButton>
         </MudCardActions>
     </MudCard>
 }
@@ -63,10 +66,15 @@
             .Where(x => x.Budget.UserID == userID && 
                    x.DurationType == durationType &&
                    DateTime.Today.Between(x.StartDate, x.EndDate));
+    }
 
-        if (this.budgetsPeriods == null)
-        {
-            
-        }
+    private string CalcPercentage(double amountSpent, double budgetAmount)
+    {
+        return $"{Math.Round(((amountSpent / budgetAmount) * 100), 2)}%";
+    }
+
+    private Color PeriodColor(double amountSpent, double budgetAmount)
+    {
+        return amountSpent <= budgetAmount ? Color.Success : Color.Error;
     }
 }

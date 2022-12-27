@@ -15,7 +15,7 @@
             <MudTextField Disabled="!isEdit" Class="mt-2" Label="Budget Name" @bind-Value="model.Name" For="@(() => model.Name)" Variant="Variant.Text" />
             <MudTextField Disabled="!isEdit" Class="mt-2" Label="Description" @bind-Value="model.Description" For="@(() => model.Description)" Variant="Variant.Outlined" Lines="2" />
             <MudSelect Disabled="!isEdit" Class="mt-2" @bind-Value="model.Catagory" For="(() => model.Catagory)" Variant="Variant.Outlined">
-                <MudSelectItem Value="@(Catagory.MortgageOrRent)">Mortgage or Rent</MudSelectItem>
+                <MudSelectItem Value="@(Catagory.Home)">Mortgage or Rent</MudSelectItem>
                 <MudSelectItem Value="@(Catagory.Transportation)" />
                 <MudSelectItem Value="@(Catagory.Food)" />
                 <MudSelectItem Value="@(Catagory.Utilities)" />

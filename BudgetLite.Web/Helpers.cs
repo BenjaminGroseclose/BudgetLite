@@ -1,4 +1,7 @@
-﻿namespace BudgetLite.Web
+﻿using BudgetLite.Data.Enums;
+using MudBlazor;
+
+namespace BudgetLite.Web
 {
     public static class Helpers
     {
@@ -12,6 +15,31 @@
         public static bool Between(this DateTime input, DateTime date1, DateTime date2)
         {
             return (input >= date1 && input <= date2);
+        }
+
+        public static string BudgetIcon(Catagory budgetCatagory)
+        {
+            switch (budgetCatagory)
+            {
+                case Catagory.Home:
+                    return Icons.Filled.House;
+                case Catagory.Transportation:
+                    return Icons.Filled.DirectionsCar;
+                case Catagory.Food:
+                    return Icons.Filled.Restaurant;
+                case Catagory.Utilities:
+                    return Icons.Filled.Bolt;
+                case Catagory.Medical:
+                    return Icons.Filled.LocalHospital;
+                case Catagory.Debt:
+                    return Icons.Filled.CreditCard;
+                case Catagory.Entertainment:
+                    return Icons.Filled.Movie;
+                case Catagory.Savings:
+                    return Icons.Filled.Savings;
+                default:
+                    return Icons.Filled.Info;
+            }
         }
     }
 }

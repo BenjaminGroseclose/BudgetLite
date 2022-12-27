@@ -8,7 +8,7 @@
     <TitleContent>
         <div style="display: flex; justify-content: space-between;">
             <div style="display: flex; margin: auto 0; height: min-content;">
-                <MudIcon Class="mt-1 mr-3" Icon="@BudgetIcon(Budget.Catagory)" />
+                <MudIcon Class="mt-1 mr-3" Icon="@Helpers.BudgetIcon(Budget.Catagory)" />
                 <MudText Typo="Typo.h6">@Budget.Name</MudText>
                 @if (doesSubBudgetTotalExceedParents)
                 {
@@ -85,30 +85,5 @@
         }
 
         this.ReloadBudgetList.Invoke();
-    }
-
-    private string BudgetIcon(Catagory budgetCatagory)
-    {
-        switch (budgetCatagory)
-        {
-            case Catagory.MortgageOrRent:
-                return Icons.Filled.House;
-            case Catagory.Transportation:
-                return Icons.Filled.DirectionsCar;
-            case Catagory.Food:
-                return Icons.Filled.Restaurant;
-            case Catagory.Utilities:
-                return Icons.Filled.Bolt;
-            case Catagory.Medical:
-                return Icons.Filled.LocalHospital;
-            case Catagory.Debt:
-                return Icons.Filled.CreditCard;
-            case Catagory.Entertainment:
-                return Icons.Filled.Movie;
-            case Catagory.Savings:
-                return Icons.Filled.Savings;
-            default:
-                return Icons.Filled.Info;
-        }
     }
 }
