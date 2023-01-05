@@ -8,20 +8,21 @@
 @inject IDialogService DialogService
 
 <div>
-    <MudButton OnClick="OpenAddTransactionDialog" Class="mb-3" Variant="Variant.Outlined" Color="Color.Primary">
-        <MudIcon Icon="@Icons.Filled.Add" />
-        Transaction
-    </MudButton>
-    <MudDatePicker
-        Class="ml-auto"
-        Label="Start Date"
-        AutoClose="true"
-        />
-    <MudDatePicker
-        Class="ml-auto"
-        Label="End Date"
-        AutoClose="true"
-        />
+    <div class="d-flex flex-row justify-space-between">
+        <MudButton OnClick="OpenAddTransactionDialog" Class="mb-3" Variant="Variant.Outlined" Color="Color.Primary">
+            <MudIcon Icon="@Icons.Filled.Add" />
+            Transaction
+        </MudButton>
+        <div class="d-flex flex-row">
+            <MudDatePicker 
+                Class="mr-6"
+                Label="Start Date"
+                AutoClose="true" />
+            <MudDatePicker 
+                Label="End Date"
+                AutoClose="true" />
+        </div>
+    </div>
 </div>
 <!-- TODO: Add date to pull transaction between -->
 <MudTable Items="@transactions" SelectedItem="selectedTransaction" Hover="true" Filter="new Func<Transaction,bool>(FilterFunc1)">
