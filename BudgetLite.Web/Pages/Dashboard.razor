@@ -1,5 +1,90 @@
-﻿<MudText Typo="Typo.h4">Dashboard</MudText>
+﻿@using static BudgetLite.Web.Shared.Dialogs.AddUpdateTransaction;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject IRepository<Transaction> TransactionRepository
+@inject IRepository<BudgetPeriod> BudgetPeriodRepository
+@inject IDialogService DialogService
+
+<MudText Typo="Typo.h4">Dashboard</MudText>
+
+<MudButton OnClick="OpenAddTransactionDialog" Class="mb-3" Variant="Variant.Outlined" Color="Color.Primary">
+    <MudIcon Icon="@Icons.Filled.Add" />
+    Transaction
+</MudButton>
+
+
 
 @code {
+    int userID = 0;
+    IEnumerable<Transaction> transactions = new List<Transaction>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var currentUser = authState.User;
+
+        if (currentUser.Claims.Any() == false)
+        {
+            return;
+        }
+
+        userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+
+        transactions = this.TransactionRepository.GetAll().Where(x => x.UserID == userID);
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OpenAddTransactionDialog()
+    {
+        var parameters = new DialogParameters { ["UserID"] = userID, ["Transaction"] = null };
+
+        var dialog = this.DialogService.Show<AddUpdateTransaction>("Add Transaction", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            AddUpdateTransactionModel data = (AddUpdateTransactionModel)result.Data;
+            await AddTransaction(data);
+        }
+    }
+
+    private async Task AddTransaction(AddUpdateTransactionModel data)
+    {
+        if (data == null)
+        {
+            throw new ArgumentNullException("Data cannot be null");
+        }
+
+        BudgetPeriod? bugetPeriod = this.BudgetPeriodRepository.GetAll().FirstOrDefault(x =>
+            x.BudgetID == data.BudgetID &&
+            x.StartDate <= data.Date &&
+            x.EndDate >= data.Date
+        );
+
+        DateTime transactionDate = data.Date.Value;
+
+        if (bugetPeriod == null)
+        {
+            int endOfMonth = DateTime.DaysInMonth(transactionDate.Year, transactionDate.Month);
+
+            bugetPeriod = await this.BudgetPeriodRepository.Insert(new BudgetPeriod
+                {
+                    BudgetID = data.BudgetID,
+                    DurationType = data.DurationType,
+                    BudgetAmount = data.BudgetAmount,
+                    StartDate = new DateTime(month: transactionDate.Month, day: 1, year: transactionDate.Year),
+                    EndDate = new DateTime(month: transactionDate.Month, day: endOfMonth, year: transactionDate.Year)
+                });
+        }
+
+        var insertedTransaction = await this.TransactionRepository.Insert(new Transaction
+            {
+                BudgetPeriodID = bugetPeriod.BudgetPeriodID,
+                Amount = data.Amount,
+                Date = transactionDate,
+                Notes = data.Notes,
+                Catagory = data.Catagory,
+                UserID = this.userID
+            });
+    }
 }
