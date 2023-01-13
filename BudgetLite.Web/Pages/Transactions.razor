@@ -1,4 +1,5 @@
 ﻿@page "/transactions"
+@using static BudgetLite.Web.Shared.Dialogs.AddUpdateTransaction;
 @attribute [Authorize]
 
 @inject AuthenticationStateProvider AuthenticationStateProvider;
@@ -24,27 +25,24 @@
     </div>
 </div>
 <!-- TODO: Add date to pull transaction between -->
-<MudTable Items="@transactions" SelectedItem="selectedTransaction" Hover="true" Filter="new Func<Transaction,bool>(FilterFunc1)">
+<MudDataGrid T="Transaction" Filterable="true" Items="@transactions" SelectedItem="selectedTransaction" Hover="true" QuickFilter="new Func<Transaction,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Transactions</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Budget Name</MudTh>
-        <MudTh>Amount</MudTh>
-        <MudTh>Catagory</MudTh>
-        <MudTh>Date</MudTh>
-        <MudTh>Notes</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Budget Name">@context.BudgetPeriod.Budget.Name</MudTd>
-        <MudTd DataLabel="Amount">$ @context.Amount</MudTd>
-        <MudTd DataLabel="Catagory">@context.Catagory</MudTd>
-        <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
-        <MudTh DataLabel="Notes">@context.Notes</MudTh>
-    </RowTemplate>
-</MudTable>
+    <Columns>
+        <SelectColumn T="Transaction" />
+        @*<Column T="Transaction" Field="BudgetPeriod.Budget.Name" Title="Budget" />*@
+        <Column T="Transaction" Field="Amount" Title="Amount" />
+        <Column T="Transaction" Field="Catagory" Title="Catagory" />
+        <Column T="Transaction" Field="Date" Title="Date" Filterable="false" />
+        <Column T="Transaction" Field="Notes" Title="Notes" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Transaction" />
+    </PagerContent>
+</MudDataGrid>
 
 @code {
     string searchString = "";
