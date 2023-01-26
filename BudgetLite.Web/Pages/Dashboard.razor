@@ -108,13 +108,13 @@
             int endOfMonth = DateTime.DaysInMonth(transactionDate.Year, transactionDate.Month);
 
             bugetPeriod = await this.BudgetPeriodRepository.Insert(new BudgetPeriod
-                {
-                    BudgetID = data.BudgetID,
-                    DurationType = data.DurationType,
-                    BudgetAmount = data.BudgetAmount,
-                    StartDate = new DateTime(month: transactionDate.Month, day: 1, year: transactionDate.Year),
-                    EndDate = new DateTime(month: transactionDate.Month, day: endOfMonth, year: transactionDate.Year)
-                });
+            {
+                BudgetID = data.BudgetID,
+                DurationType = data.DurationType,
+                BudgetAmount = data.BudgetAmount,
+                StartDate = new DateTime(month: transactionDate.Month, day: 1, year: transactionDate.Year),
+                EndDate = new DateTime(month: transactionDate.Month, day: endOfMonth, year: transactionDate.Year)
+            });
         }
 
         var insertedTransaction = await this.TransactionRepository.Insert(new Transaction
@@ -124,7 +124,8 @@
             Date = transactionDate,
             Notes = data.Notes,
             Catagory = data.Catagory,
-            UserID = this.userID
+            UserID = this.userID,
+            Name = data.Name
         });
 
         if (insertedTransaction != null)

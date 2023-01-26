@@ -12,6 +12,14 @@
         <DialogContent>
             <MudTextField 
                 Class="mt-2"
+                Label="Transaction Name"
+                Variant="Variant.Outlined"
+                @bind-Value="model.Name"
+                For="@(() => model.Name)">
+            </MudTextField>
+            <MudTextField 
+                T="double"
+                Class="mt-2"
                 Label="Amount"
                 Variant="Variant.Outlined"
                 @bind-Value="model.Amount"
@@ -35,6 +43,7 @@
                 }
             </MudSelect>
             <MudTextField
+                T="string"
                 Class="mt-2"
                 Label="Notes"
                 @bind-Value="model.Notes"
@@ -80,6 +89,7 @@
         this.model.DurationType = selectedBudget.DurationType;
         this.model.BudgetAmount = selectedBudget.Amount;
         this.model.Catagory = selectedBudget.Catagory;
+        
         MudDialog.Close(this.model);
     }
 
@@ -96,6 +106,9 @@
         {
 
         }
+
+        [Required]
+        public string Name { get; set; }
 
         [Required]
         [Range(0.1, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]

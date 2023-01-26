@@ -7,6 +7,8 @@ namespace BudgetLite.Data.Models
     {
         public int TransactionID { get; set; }
 
+        public string Name { get; set; }
+
         [ForeignKey(nameof(BudgetPeriodID))]
         public int BudgetPeriodID { get; set; }
         public BudgetPeriod BudgetPeriod { get; set; }
