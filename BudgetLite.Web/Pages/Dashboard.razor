@@ -28,18 +28,18 @@
                 <MudSpacer />
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>Budget Name</MudTh>
+                <MudTh>Name</MudTh>
                 <MudTh>Amount</MudTh>
                 <MudTh>Catagory</MudTh>
+                <MudTh>Budget</MudTh>
                 <MudTh>Date</MudTh>
-                <MudTh>Notes</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Budget Name">@context.BudgetPeriod.Budget.Name</MudTd>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
                 <MudTd DataLabel="Amount">$ @context.Amount</MudTd>
+                <MudTd DataLabel="Budget">@context.BudgetPeriod.Budget.Name</MudTd>
                 <MudTd DataLabel="Catagory">@context.Catagory</MudTd>
                 <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
-                <MudTh DataLabel="Notes">@context.Notes</MudTh>
             </RowTemplate>
         </MudTable>
         <MudButton Href="transactions" Class="mt-3" Variant="Variant.Filled" Color="Color.Secondary">
@@ -47,6 +47,8 @@
         </MudButton>
     </div>
     <div>
+        <!-- TODO: Figoure out constant colors -->
+        <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" @bind-SelectedIndex="Index" InputData="@transactionData" InputLabels="@transactionLabels" />
     </div>
 
 </div>
@@ -54,7 +56,12 @@
 
 
 @code {
+    int Index = -1;
     int userID = 0;
+
+    double[] transactionData;
+    string[] transactionLabels;
+
     IEnumerable<Transaction> transactions = new List<Transaction>();
 
     protected override async Task OnInitializedAsync()
@@ -71,7 +78,25 @@
 
         transactions = this.TransactionRepository.GetAll().Where(x => x.UserID == userID).OrderByDescending(d => d.Date);
 
+        ChartData();
+
         await base.OnInitializedAsync();
+    }
+
+    private void ChartData()
+    {
+        List<string> labels = new List<string>();
+        List<double> data = new List<double>();
+
+
+        foreach (var transaction in this.transactions.GroupBy(x => x.BudgetPeriod.Budget))
+        {
+            labels.Add(transaction.Key.Name);
+            data.Add(transaction.Select(x => x.Amount).Sum());
+        }
+
+        this.transactionData = data.ToArray();
+        this.transactionLabels = labels.ToArray();
     }
 
     private async Task OpenAddTransactionDialog()
@@ -131,6 +156,8 @@
         if (insertedTransaction != null)
         {
             transactions = this.TransactionRepository.GetAll().Where(x => x.UserID == userID).OrderByDescending(d => d.Date);
+
+            ChartData();
         }
     }
 }
