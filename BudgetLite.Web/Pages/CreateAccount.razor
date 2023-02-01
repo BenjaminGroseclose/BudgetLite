@@ -19,15 +19,33 @@
             <MudText Typo="Typo.h5">Create Account</MudText>
         </MudCardHeader>
         <MudCardContent>
-            <MudTextField Label="Username" @bind-Value="model.Username" For="@(() => model.Username)" />
-            <MudTextField Label="First Name" @bind-Value="model.FirstName" For="@(() => model.FirstName)" />
-            <MudTextField Label="Last Name" @bind-Value="model.LastName" For="@(() => model.LastName)" />
-            <MudTextField Label="Email" @bind-Value="model.Email" For="@(() => model.Email)"
+            <MudTextField 
+                Label="Username" 
+                @bind-Value="model.Username" 
+                For="@(() => model.Username)" />
+            <MudTextField 
+                Label="First Name"
+                @bind-Value="model.FirstName"
+                For="@(() => model.FirstName)" />
+            <MudTextField 
+                Label="Last Name"
+                @bind-Value="model.LastName"
+                For="@(() => model.LastName)" />
+            <MudTextField 
+                Label="Email" 
+                @bind-Value="model.Email"
+                For="@(() => model.Email)"
                 InputType="InputType.Email" />
-            <MudTextField Label="Password" @bind-Value="model.Password" For="@(() => model.Password)"
+            <MudTextField 
+                Label="Password" 
+                @bind-Value="model.Password" 
+                For="@(() => model.Password)"
                 InputType="InputType.Password" />
-            <MudTextField Label="Confirm Password" @bind-Value="model.ConfirmPassword"
-                          For="@(() => model.ConfirmPassword)" InputType="InputType.Password" />
+            <MudTextField 
+                Label="Confirm Password"
+                @bind-Value="model.ConfirmPassword"
+                For="@(() => model.ConfirmPassword)"
+                InputType="InputType.Password" />
         </MudCardContent>
         <MudCardActions>
             <MudButton Variant="Variant.Outlined" Color="Color.Error" Class="ml-auto mr-3" Href="/">Cancel</MudButton>

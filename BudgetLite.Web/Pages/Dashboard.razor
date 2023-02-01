@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<div class="d-flex justify-space-between">
+<div>
     <div>
         <MudTable Items="@transactions.Take(10)">
             <ToolBarContent>
@@ -46,22 +46,45 @@
             View All
         </MudButton>
     </div>
-    <div>
+    <MudCard Class="d-flex justify-space-evenly mt-6">
         <!-- TODO: Figoure out constant colors -->
-        <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" @bind-SelectedIndex="Index" InputData="@transactionData" InputLabels="@transactionLabels" />
-    </div>
+        <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@transactionData" InputLabels="@transactionLabels" />
+        
+        <div class="mt-6">
+            <MudTable Items="@groupedTransaction" SortLabel="Sort By">
+                <HeaderContent>
+                    <MudTh></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.Key.Name)">Name</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.Select(x => x.Amount).Sum())">Amount</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.Key.Name)">%</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.OrderByDescending(x => x.CreatedDate).FirstOrDefault()?.CreatedDate.ToShortDateString())">Last Transaction Date</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd><MudIcon Class="mt-1 mr-3" Icon="@Helpers.BudgetIcon(@context.Key.Catagory)" /></MudTd>
+                    <MudTd DataLabel="Name">@context.Key.Name</MudTd>
+                    <MudTd DataLabel="Amount">@context.Select(x => x.Amount).Sum()</MudTd>
+                    <MudTd DataLabel="%">@(((@context.Select(x => x.Amount).Sum() / totalTransactionAmount) * 100).ToString("#.##"))%</MudTd>
+                    <MudTd DataLabel="Last Transaction Date">@context.OrderByDescending(x => x.CreatedDate).FirstOrDefault()?.CreatedDate.ToShortDateString()</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
+        
+    </MudCard>
 
 </div>
 
 
 
 @code {
-    int Index = -1;
+    int graphIndex = -1;
     int userID = 0;
 
     double[] transactionData;
     string[] transactionLabels;
 
+    double totalTransactionAmount;
+
+    IEnumerable<IGrouping<Budget, Transaction>> groupedTransaction;
     IEnumerable<Transaction> transactions = new List<Transaction>();
 
     protected override async Task OnInitializedAsync()
@@ -85,11 +108,14 @@
 
     private void ChartData()
     {
+        totalTransactionAmount = this.transactions.Select(x => x.Amount).Sum();
+
         List<string> labels = new List<string>();
         List<double> data = new List<double>();
 
+        this.groupedTransaction = this.transactions.GroupBy(x => x.BudgetPeriod.Budget);
 
-        foreach (var transaction in this.transactions.GroupBy(x => x.BudgetPeriod.Budget))
+        foreach (var transaction in groupedTransaction)
         {
             labels.Add(transaction.Key.Name);
             data.Add(transaction.Select(x => x.Amount).Sum());

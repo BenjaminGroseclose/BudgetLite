@@ -1,6 +1,6 @@
 ﻿@inject IRepository<Budget> budgetRepository;
 
-<EditForm Model="@model" OnValidSubmit="Save">
+<EditForm Model="@model" OnValidSubmit="Save" style="width: 500px">
     <DataAnnotationsValidator />
     <MudDialog>
         <TitleContent>
@@ -13,7 +13,6 @@
             <MudTextField 
                 Class="mt-2"
                 Label="Transaction Name"
-                Variant="Variant.Outlined"
                 @bind-Value="model.Name"
                 For="@(() => model.Name)">
             </MudTextField>
@@ -21,21 +20,21 @@
                 T="double"
                 Class="mt-2"
                 Label="Amount"
-                Variant="Variant.Outlined"
                 @bind-Value="model.Amount"
                 For="@(() => model.Amount)"
                 Adornment="Adornment.Start"
                 AdornmentColor="Color.Success"
                 AdornmentIcon="@Icons.Material.Filled.AttachMoney">
             </MudTextField>
-            <MudDatePicker Class="mt-2"
+            <MudDatePicker 
+                Class="mt-2"
                 Label="Transaction Date"
                 @bind-Date="model.Date"
                 For="@(() => model.Date)"
                 AutoClose="true"
-                Variant="Variant.Outlined">
+                >
             </MudDatePicker>
-            <MudSelect Class="mt-2" Label="Budget" Variant="Variant.Outlined" @bind-Value="model.BudgetID" For="@(() => model.BudgetID)">
+            <MudSelect Class="mt-2" Label="Budget"  @bind-Value="model.BudgetID" For="@(() => model.BudgetID)">
                 <MudSelectItem Value="0">Select a Budget...</MudSelectItem>
                 @foreach(var budget in this.Budgets)
                 {
@@ -48,12 +47,11 @@
                 Label="Notes"
                 @bind-Value="model.Notes"
                 For="@(() => model.Notes)"
-                Variant="Variant.Outlined" 
                 Lines="2">
             </MudTextField>
         </DialogContent>
         <DialogActions>
-            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
+            <MudButton  Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Save</MudButton>
         </DialogActions>
     </MudDialog>
@@ -79,6 +77,11 @@
         }
 
         this.Budgets = this.budgetRepository.GetAll().Where(x => x.UserID == this.UserID);
+
+        var parentBudgetIDs = this.Budgets.Where(x => x.ParentBudgetID.HasValue).Select(x => x.ParentBudgetID).Distinct();
+
+        this.Budgets = this.Budgets.Where(x => !parentBudgetIDs.Contains(x.BudgetID));
+
         base.OnInitialized();
     }
 

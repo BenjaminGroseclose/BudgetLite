@@ -9,8 +9,9 @@ namespace BudgetLite.Data.Models
 
         public string Name { get; set; }
 
-        [ForeignKey(nameof(BudgetPeriodID))]
         public int BudgetPeriodID { get; set; }
+
+        [ForeignKey(nameof(BudgetPeriodID))]
         public BudgetPeriod BudgetPeriod { get; set; }
         public double Amount { get; set; }
         public DateTime Date { get; set; }
