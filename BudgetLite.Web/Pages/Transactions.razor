@@ -9,7 +9,7 @@
 
 <div>
     <div class="d-flex flex-row justify-space-between">
-        <MudButton OnClick="OpenAddTransactionDialog" Class="mb-3" Variant="Variant.Outlined" Color="Color.Primary">
+        <MudButton OnClick="() => OpenAddTransactionDialog(null)" Class="mb-3" Variant="Variant.Outlined" Color="Color.Primary">
             <MudIcon Icon="@Icons.Filled.Add" />
             Transaction
         </MudButton>
@@ -59,11 +59,11 @@
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
-                <MudText>Amount: @context.Item.Amount</MudText>
+                <MudText>Amount: @context.Item.Amount.ToString("C")</MudText>
                 <MudText>Notes: @context.Item.Notes</MudText>
             </MudCardContent>
             <MudCardActions>
-                <MudButton Variant="Variant.Text" Color="Color.Primary">Edit</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => OpenAddTransactionDialog(context.Item)">Edit</MudButton>
                 <MudButton Variant="Variant.Filled" Color="Color.Error">Delete</MudButton>
             </MudCardActions>
         </MudCard>
@@ -96,9 +96,9 @@
         await base.OnInitializedAsync();
     }
 
-    private async Task OpenAddTransactionDialog()
+    private async Task OpenAddTransactionDialog(Transaction transaction)
     {
-        var parameters = new DialogParameters { ["UserID"] = userID, ["Transaction"] = null };
+        var parameters = new DialogParameters { ["UserID"] = userID, ["Transaction"] = transaction };
 
         var dialog = this.DialogService.Show<AddUpdateTransaction>("Add Transaction", parameters);
         var result = await dialog.Result;

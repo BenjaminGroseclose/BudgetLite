@@ -37,6 +37,8 @@ namespace BudgetLite.Web
                     return Icons.Filled.Movie;
                 case Catagory.Savings:
                     return Icons.Filled.Savings;
+                case Catagory.Shopping:
+                    return Icons.Filled.ShoppingCart;
                 default:
                     return Icons.Filled.Info;
             }

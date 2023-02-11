@@ -12,7 +12,9 @@
                 <MudText Typo="Typo.h6">@Budget.Name</MudText>
                 @if (doesSubBudgetTotalExceedParents)
                 {
-                    <MudIcon Class="mt-1 ml-2" Icon="@Icons.Filled.Error" Color="Color.Error" />
+                    <MudTooltip Text="The sum amount for all sub-budgets exceeds this budgets amount. Please update this budget or it's children">
+                        <MudIcon Class="mt-1 ml-2" Icon="@Icons.Filled.Error" Color="Color.Error" />
+                    </MudTooltip>
                 }
             </div>
             <MudIconButton Icon="@Icons.Filled.Delete" OnClick="async () => await DeleteBudget(Budget)" />

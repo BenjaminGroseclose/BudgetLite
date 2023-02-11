@@ -9,31 +9,48 @@
     Budget periods are process automatically behind the scenes. When a transaction is created against a budget we 
     automatically assign that transaction to a budget period based on the date of the transaction.
 </MudText>
-<MudRadioGroup Class="mt-2" T="DurationType" SelectedOptionChanged="LoadBudgetPeriodForDuration">
+<!-- TODO: Figure out best way to handle multiple DurationTypes -->
+@*<MudRadioGroup Class="mt-2" T="DurationType" SelectedOptionChanged="LoadBudgetPeriodForDuration">
     <!--<MudRadio Option="@(DurationType.WEEKLY)">Weekly</MudRadio> -->
     <MudRadio Option="@(DurationType.MONTHLY)">Monthly</MudRadio>
     <MudRadio Option="@(DurationType.QUARTERLY)">Quarterly</MudRadio>
     <MudRadio Option="@(DurationType.YEARLY)">Yearly</MudRadio>
-</MudRadioGroup>
+</MudRadioGroup>*@
 
 <!-- Should have an option to view all budget periods for a budget -->
 @foreach(BudgetPeriod budgetPeriod in this.budgetsPeriods)
 {
-    <MudCard>
+    <MudCard Class="mt-5">
         <MudCardHeader>
             <MudIcon Class="mt-1 mr-3" Icon="@Helpers.BudgetIcon(budgetPeriod.Budget.Catagory)" />
             <MudText Typo="Typo.h6">@budgetPeriod.Budget.Name @budgetPeriod.StartDate.ToShortDateString() - @budgetPeriod.EndDate.ToShortDateString()</MudText>
         </MudCardHeader>
         <MudCardContent>
-            <MudChart Style="width: fit-content" ChartOptions="@options" LegendPosition="Position.Bottom" ChartType="ChartType.Donut" Height="200px" InputData="GetData(budgetPeriod)" InputLabels="@chartLabels">
-                <CustomGraphics>
-                    <MudText Typo="Typo.caption">
-                        <MudText Typo="Typo.subtitle1" Color="PeriodColor(budgetPeriod.AmountSpent, budgetPeriod.BudgetAmount)" Class="mb-6">
-                            <b>@CalcPercentage(budgetPeriod.AmountSpent, budgetPeriod.BudgetAmount)</b>
+            <MudStack Row="true">
+                <MudChart Style="width: fit-content" ChartOptions="@options" LegendPosition="Position.Bottom" ChartType="ChartType.Donut" Height="200px" InputData="GetData(budgetPeriod)" InputLabels="@chartLabels">
+                    <CustomGraphics>
+                        <MudText Typo="Typo.caption">
+                            <MudText Typo="Typo.subtitle1" Color="PeriodColor(budgetPeriod.AmountSpent, budgetPeriod.BudgetAmount)" Class="mb-6">
+                                <b>@CalcPercentage(budgetPeriod.AmountSpent, budgetPeriod.BudgetAmount)</b>
+                            </MudText>
                         </MudText>
-                    </MudText>
-                </CustomGraphics>
-            </MudChart>
+                    </CustomGraphics>
+                </MudChart>
+                <MudTable Items="@budgetPeriod.Transactions.OrderByDescending(x => x.Amount).Take(5)" Class="ml-4">
+                    <HeaderContent>
+                        <MudTh>Name</MudTh>
+                        <MudTh>Amount</MudTh>
+                        <MudTh>%</MudTh>
+                        <MudTh>Date</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Name">@context.Name</MudTd>
+                        <MudTd DataLabel="Amount">@context.Amount.ToString("C")</MudTd>
+                        <MudTd DataLabel="%">@(((context.Amount / @budgetPeriod.AmountSpent) * 100).ToString("#.##"))%</MudTd>
+                        <MudTd DataLabel="Last Transaction Date">@context.Date.ToShortDateString()</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudStack>
         </MudCardContent>
         <MudCardActions>
             <MudButton Color="Color.Primary" Variant="Variant.Outlined">View All Transactions</MudButton>
@@ -42,7 +59,6 @@
 }
 
 @code {
-    bool loading = false;
     int userID = 0;
     IEnumerable<BudgetPeriod> budgetsPeriods = new List<BudgetPeriod>();
     string[] chartLabels = new string[] { "Amount Left", "Amount Spent" };

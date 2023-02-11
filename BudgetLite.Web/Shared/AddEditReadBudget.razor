@@ -21,6 +21,7 @@
                 <MudSelectItem Value="@(Catagory.Utilities)" />
                 <MudSelectItem Value="@(Catagory.Medical)" />
                 <MudSelectItem Value="@(Catagory.Debt)" />
+                <MudSelectItem Value="@(Catagory.Shopping)" />
                 <MudSelectItem Value="@(Catagory.Entertainment)" />
                 <MudSelectItem Value="@(Catagory.Savings)" />
             </MudSelect>
@@ -37,9 +38,9 @@
             </MudTextField>
             <MudRadioGroup Class="mt-2" T="DurationType" @bind-SelectedOption="model.DurationType">
                 <!--<MudRadio Disabled="!isEdit" Option="@(DurationType.WEEKLY)">Weekly</MudRadio>-->
-                <MudRadio Disabled="!isEdit" Option="@(DurationType.MONTHLY)">Monthly</MudRadio>
-                <MudRadio Disabled="!isEdit" Option="@(DurationType.QUARTERLY)">Quarterly</MudRadio>
-                <MudRadio Disabled="!isEdit" Option="@(DurationType.YEARLY)">Yearly</MudRadio>
+                <MudRadio Disabled="true" Option="@(DurationType.MONTHLY)">Monthly</MudRadio>
+                <MudRadio Disabled="true" Option="@(DurationType.QUARTERLY)">Quarterly</MudRadio>
+                <MudRadio Disabled="true" Option="@(DurationType.YEARLY)">Yearly</MudRadio>
             </MudRadioGroup>
         </MudCardContent>
         <MudCardActions>
@@ -91,6 +92,8 @@
         if (Budget == null)
         {
             model = new Model();
+            // Hard coded for now
+            model.DurationType = DurationType.MONTHLY;
             isEdit = true;
         }
         else

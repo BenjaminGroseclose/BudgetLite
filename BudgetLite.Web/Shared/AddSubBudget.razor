@@ -25,6 +25,7 @@
                 <MudSelectItem Value="@(Catagory.Utilities)" />
                 <MudSelectItem Value="@(Catagory.Medical)" />
                 <MudSelectItem Value="@(Catagory.Debt)" />
+                <MudSelectItem Value="@(Catagory.Shopping)" />
                 <MudSelectItem Value="@(Catagory.Entertainment)" />
                 <MudSelectItem Value="@(Catagory.Savings)" />
             </MudSelect>
@@ -97,7 +98,8 @@
                 Catagory = model.Catagory,
                 Amount = model.Amount,
                 UserID = userID,
-                ParentBudgetID = parentBudget.BudgetID
+                ParentBudgetID = parentBudget.BudgetID,
+                DurationType = parentBudget.DurationType
             });
 
             this.snackbar.Add("Successfully added the sub budget.", Severity.Success);

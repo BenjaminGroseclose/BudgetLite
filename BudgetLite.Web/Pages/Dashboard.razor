@@ -22,9 +22,19 @@
 
 <div>
     <div>
-        <MudTable Items="@transactions.Take(10)">
+        @if (transactions.Any())
+        {
+            
+        }
+        else
+        {
+            <MudCard>
+
+            </MudCard>
+        }
+        <MudTable Items="@transactions">
             <ToolBarContent>
-                <MudText Typo="Typo.h6">Transactions</MudText>
+                <MudText Typo="Typo.h6">Transactions - @DateTime.Now.ToString("MMM")</MudText>
                 <MudSpacer />
             </ToolBarContent>
             <HeaderContent>
@@ -36,7 +46,7 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Name">@context.Name</MudTd>
-                <MudTd DataLabel="Amount">$ @context.Amount</MudTd>
+                <MudTd DataLabel="Amount">@context.Amount.ToString("C")</MudTd>
                 <MudTd DataLabel="Budget">@context.BudgetPeriod.Budget.Name</MudTd>
                 <MudTd DataLabel="Catagory">@context.Catagory</MudTd>
                 <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
@@ -46,30 +56,34 @@
             View All
         </MudButton>
     </div>
-    <MudCard Class="d-flex justify-space-evenly mt-6">
-        <!-- TODO: Figoure out constant colors -->
-        <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@transactionData" InputLabels="@transactionLabels" />
-        
-        <div class="mt-6">
-            <MudTable Items="@groupedTransaction" SortLabel="Sort By">
-                <HeaderContent>
-                    <MudTh></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.Key.Name)">Name</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.Select(x => x.Amount).Sum())">Amount</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.Key.Name)">%</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.OrderByDescending(x => x.CreatedDate).FirstOrDefault()?.CreatedDate.ToShortDateString())">Last Transaction Date</MudTableSortLabel></MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd><MudIcon Class="mt-1 mr-3" Icon="@Helpers.BudgetIcon(@context.Key.Catagory)" /></MudTd>
-                    <MudTd DataLabel="Name">@context.Key.Name</MudTd>
-                    <MudTd DataLabel="Amount">@context.Select(x => x.Amount).Sum()</MudTd>
-                    <MudTd DataLabel="%">@(((@context.Select(x => x.Amount).Sum() / totalTransactionAmount) * 100).ToString("#.##"))%</MudTd>
-                    <MudTd DataLabel="Last Transaction Date">@context.OrderByDescending(x => x.CreatedDate).FirstOrDefault()?.CreatedDate.ToShortDateString()</MudTd>
-                </RowTemplate>
-            </MudTable>
-        </div>
-        
-    </MudCard>
+
+    @if (transactions.Any())
+    {
+        <MudCard Class="d-flex justify-space-evenly mt-6">
+            <!-- TODO: Figoure out constant colors -->
+            <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@transactionData" InputLabels="@transactionLabels" />
+
+            <div class="mt-6">
+                <MudTable Items="@groupedTransaction" SortLabel="Sort By">
+                    <HeaderContent>
+                        <MudTh></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.Key.Name)">Name</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.Select(x => x.Amount).Sum())">Amount</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.Key.Name)">%</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<IGrouping<Budget, Transaction>, object>(x=> x.OrderByDescending(x => x.CreatedDate).FirstOrDefault()?.CreatedDate.ToShortDateString())">Last Transaction Date</MudTableSortLabel></MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd><MudIcon Class="mt-1 mr-3" Icon="@Helpers.BudgetIcon(@context.Key.Catagory)" /></MudTd>
+                        <MudTd DataLabel="Name">@context.Key.Name</MudTd>
+                        <MudTd DataLabel="Amount">@context.Select(x => x.Amount).Sum().ToString("C")</MudTd>
+                        <MudTd DataLabel="%">@(((@context.Select(x => x.Amount).Sum() / totalTransactionAmount) * 100).ToString("#.##"))%</MudTd>
+                        <MudTd DataLabel="Last Transaction Date">@context.OrderByDescending(x => x.CreatedDate).FirstOrDefault()?.CreatedDate.ToShortDateString()</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </div>
+        </MudCard>
+    }
+
 
 </div>
 
@@ -81,7 +95,6 @@
 
     double[] transactionData;
     string[] transactionLabels;
-
     double totalTransactionAmount;
 
     IEnumerable<IGrouping<Budget, Transaction>> groupedTransaction;
@@ -99,7 +112,10 @@
 
         userID = int.Parse(currentUser.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
 
-        transactions = this.TransactionRepository.GetAll().Where(x => x.UserID == userID).OrderByDescending(d => d.Date);
+        transactions = this.TransactionRepository.GetAll()
+            .Where(x => x.UserID == userID && x.CreatedDate.Month == DateTime.Now.Month)
+            .OrderByDescending(d => d.Date)
+            .Take(10);
 
         ChartData();
 
@@ -181,7 +197,10 @@
 
         if (insertedTransaction != null)
         {
-            transactions = this.TransactionRepository.GetAll().Where(x => x.UserID == userID).OrderByDescending(d => d.Date);
+            transactions = this.TransactionRepository.GetAll()
+                .Where(x => x.UserID == userID && x.CreatedDate.Month == DateTime.Now.Month)
+                .OrderByDescending(d => d.Date)
+                .Take(10);
 
             ChartData();
         }

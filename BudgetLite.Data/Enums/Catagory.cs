@@ -9,6 +9,7 @@
         Medical,
         Debt,
         Entertainment,
-        Savings
+        Savings,
+        Shopping
     }
 }
