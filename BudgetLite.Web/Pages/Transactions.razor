@@ -6,6 +6,7 @@
 @inject IRepository<Transaction> TransactionRepository
 @inject IRepository<BudgetPeriod> BudgetPeriodRepository
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <div>
     <div class="d-flex flex-row justify-space-between">
@@ -35,7 +36,11 @@
     <Columns>
         <HierarchyColumn T="Transaction" />
         <Column T="Transaction" Field="Name" Title="Name" />
-        <Column T="Transaction" Field="Amount" Title="Amount" />
+        <Column T="Transaction" Title="Amount">
+            <CellTemplate>
+                @context.Item.Amount.ToString("C")
+            </CellTemplate>
+        </Column>
         <Column T="Transaction" Title="Budget" >
             <CellTemplate>
                 @context.Item.BudgetPeriod?.Budget.Name
@@ -54,17 +59,21 @@
                 <CardHeaderContent>
                     <div class="d-flex">
                         <MudIcon Class="mt-1 mr-3" Icon="@Helpers.BudgetIcon(@context.Item.BudgetPeriod.Budget.Catagory)" />
-                        <MudText Typo="Typo.h6">@context.Item.BudgetPeriod.Budget.Name</MudText>
+                        <MudText Typo="Typo.h6">@context.Item.Name</MudText>
                     </div>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
                 <MudText>Amount: @context.Item.Amount.ToString("C")</MudText>
-                <MudText>Notes: @context.Item.Notes</MudText>
+                <MudText>Budget: @context.Item.BudgetPeriod.Budget.Name</MudText>
+                @if (string.IsNullOrEmpty(@context.Item.Notes) == false)
+                {
+                    <MudText>Notes: @context.Item.Notes</MudText>
+                }
             </MudCardContent>
             <MudCardActions>
                 <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => OpenAddTransactionDialog(context.Item)">Edit</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Error">Delete</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => DeleteTransaction(context.Item.TransactionID, context.Item.Name)">Delete</MudButton>
             </MudCardActions>
         </MudCard>
     </ChildRowContent>
@@ -78,6 +87,10 @@
     int userID = 0;
     IEnumerable<Transaction> transactions = new List<Transaction>();
     Transaction selectedTransaction;
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "budgetPeriodID")]
+    public int? BudgetPeriodID { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,6 +106,11 @@
 
         transactions = this.TransactionRepository.GetAll().Where(x => x.UserID == userID).OrderByDescending(x => x.Date);
 
+        if (BudgetPeriodID.HasValue)
+        {
+            transactions = transactions.Where(x => x.BudgetPeriodID == BudgetPeriodID);
+        }
+
         await base.OnInitializedAsync();
     }
 
@@ -106,7 +124,31 @@
         if (!result.Cancelled)
         {
             AddUpdateTransactionModel data = (AddUpdateTransactionModel)result.Data;
-            await AddTransaction(data);
+            if (transaction == null)
+            {
+
+                await AddTransaction(data);
+            }
+            else
+            {
+                await UpdateTransacton(transaction.TransactionID, data);
+            }
+        }
+
+        transactions = this.TransactionRepository.GetAll().Where(x => x.UserID == userID).OrderByDescending(x => x.Date);
+    }
+
+    private async Task DeleteTransaction(int transactionID, string name)
+    {
+        bool result = await this.TransactionRepository.Delete(transactionID);
+
+        if (result)
+        {
+            this.Snackbar.Add($"Deleted the transaction: {name}", Severity.Success);
+        }
+        else
+        {
+            this.Snackbar.Add($"Failed to delete transaction, please try again.", Severity.Warning);
         }
     }
 
@@ -131,7 +173,7 @@
     {
         if (data == null)
         {
-            throw new ArgumentNullException("Data cannot be null");
+            throw new ArgumentNullException("Transaction cannot be null");
         }
 
         BudgetPeriod? bugetPeriod = this.BudgetPeriodRepository.GetAll().FirstOrDefault(x =>
@@ -156,7 +198,48 @@
             });
         }
 
-        var insertedTransaction = await this.TransactionRepository.Insert(new Transaction
+        await this.TransactionRepository.Insert(new Transaction
+        {
+            BudgetPeriodID = bugetPeriod.BudgetPeriodID,
+            Amount = data.Amount,
+            Date = transactionDate,
+            Notes = data.Notes,
+            Catagory = data.Catagory,
+            UserID = this.userID,
+            Name = data.Name
+        });
+    }
+
+    private async Task UpdateTransacton(int transactionID, AddUpdateTransactionModel data)
+    {
+        if (data == null)
+        {
+            throw new ArgumentNullException("Transaction cannot be null");
+        }
+
+        BudgetPeriod? bugetPeriod = this.BudgetPeriodRepository.GetAll().FirstOrDefault(x =>
+            x.BudgetID == data.BudgetID &&
+            x.StartDate <= data.Date &&
+            x.EndDate >= data.Date
+            );
+
+        DateTime transactionDate = data.Date.Value;
+
+        if (bugetPeriod == null)
+        {
+            int endOfMonth = DateTime.DaysInMonth(transactionDate.Year, transactionDate.Month);
+
+            bugetPeriod = await this.BudgetPeriodRepository.Insert(new BudgetPeriod
+                {
+                    BudgetID = data.BudgetID,
+                    DurationType = data.DurationType,
+                    BudgetAmount = data.BudgetAmount,
+                    StartDate = new DateTime(month: transactionDate.Month, day: 1, year: transactionDate.Year),
+                    EndDate = new DateTime(month: transactionDate.Month, day: endOfMonth, year: transactionDate.Year)
+                });
+        }
+
+        await this.TransactionRepository.Update(transactionID, new Transaction
         {
             BudgetPeriodID = bugetPeriod.BudgetPeriodID,
             Amount = data.Amount,

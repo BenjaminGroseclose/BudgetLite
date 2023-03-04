@@ -24,7 +24,29 @@
     <div>
         @if (transactions.Any())
         {
-            
+            <MudTable Items="@transactions.Take(10)">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Transactions - @DateTime.Now.ToString("MMM")</MudText>
+                    <MudSpacer />
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Amount</MudTh>
+                    <MudTh>Catagory</MudTh>
+                    <MudTh>Budget</MudTh>
+                    <MudTh>Date</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Amount">@context.Amount.ToString("C")</MudTd>
+                    <MudTd DataLabel="Budget">@context.BudgetPeriod.Budget.Name</MudTd>
+                    <MudTd DataLabel="Catagory">@context.Catagory</MudTd>
+                    <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
+                </RowTemplate>
+            </MudTable>
+            <MudButton Href="transactions" Class="mt-3" Variant="Variant.Filled" Color="Color.Secondary">
+                View All
+            </MudButton>
         }
         else
         {
@@ -32,29 +54,6 @@
 
             </MudCard>
         }
-        <MudTable Items="@transactions">
-            <ToolBarContent>
-                <MudText Typo="Typo.h6">Transactions - @DateTime.Now.ToString("MMM")</MudText>
-                <MudSpacer />
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh>Name</MudTh>
-                <MudTh>Amount</MudTh>
-                <MudTh>Catagory</MudTh>
-                <MudTh>Budget</MudTh>
-                <MudTh>Date</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Name">@context.Name</MudTd>
-                <MudTd DataLabel="Amount">@context.Amount.ToString("C")</MudTd>
-                <MudTd DataLabel="Budget">@context.BudgetPeriod.Budget.Name</MudTd>
-                <MudTd DataLabel="Catagory">@context.Catagory</MudTd>
-                <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
-            </RowTemplate>
-        </MudTable>
-        <MudButton Href="transactions" Class="mt-3" Variant="Variant.Filled" Color="Color.Secondary">
-            View All
-        </MudButton>
     </div>
 
     @if (transactions.Any())
@@ -63,7 +62,7 @@
             <!-- TODO: Figoure out constant colors -->
             <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@transactionData" InputLabels="@transactionLabels" />
 
-            <div class="mt-6">
+            <div class="mt-6 mb-6 mr-6">
                 <MudTable Items="@groupedTransaction" SortLabel="Sort By">
                     <HeaderContent>
                         <MudTh></MudTh>
@@ -77,7 +76,7 @@
                         <MudTd DataLabel="Name">@context.Key.Name</MudTd>
                         <MudTd DataLabel="Amount">@context.Select(x => x.Amount).Sum().ToString("C")</MudTd>
                         <MudTd DataLabel="%">@(((@context.Select(x => x.Amount).Sum() / totalTransactionAmount) * 100).ToString("#.##"))%</MudTd>
-                        <MudTd DataLabel="Last Transaction Date">@context.OrderByDescending(x => x.CreatedDate).FirstOrDefault()?.CreatedDate.ToShortDateString()</MudTd>
+                        <MudTd DataLabel="Last Transaction Date">@context.OrderByDescending(x => x.Date).FirstOrDefault()?.Date.ToShortDateString()</MudTd>
                     </RowTemplate>
                 </MudTable>
             </div>
@@ -114,8 +113,7 @@
 
         transactions = this.TransactionRepository.GetAll()
             .Where(x => x.UserID == userID && x.CreatedDate.Month == DateTime.Now.Month)
-            .OrderByDescending(d => d.Date)
-            .Take(10);
+            .OrderByDescending(d => d.Date);
 
         ChartData();
 

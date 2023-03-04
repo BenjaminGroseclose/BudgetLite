@@ -92,7 +92,7 @@
         this.model.DurationType = selectedBudget.DurationType;
         this.model.BudgetAmount = selectedBudget.Amount;
         this.model.Catagory = selectedBudget.Catagory;
-        
+
         MudDialog.Close(this.model);
     }
 
@@ -107,7 +107,12 @@
 
         public AddUpdateTransactionModel(Transaction transaction)
         {
-
+            this.Name = transaction.Name;
+            this.Amount = transaction.Amount;
+            this.Date = transaction.Date;
+            this.BudgetID = transaction.BudgetPeriod.BudgetID;
+            this.Notes = transaction.Notes;
+            this.DurationType = transaction.BudgetPeriod.DurationType;
         }
 
         [Required]

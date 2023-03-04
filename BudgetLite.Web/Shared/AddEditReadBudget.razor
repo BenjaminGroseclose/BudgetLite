@@ -14,8 +14,9 @@
         <MudCardContent>
             <MudTextField Disabled="!isEdit" Class="mt-2" Label="Budget Name" @bind-Value="model.Name" For="@(() => model.Name)" Variant="Variant.Text" />
             <MudTextField Disabled="!isEdit" Class="mt-2" Label="Description" @bind-Value="model.Description" For="@(() => model.Description)" Variant="Variant.Outlined" Lines="2" />
-            <MudSelect Disabled="!isEdit" Class="mt-2" @bind-Value="model.Catagory" For="(() => model.Catagory)" Variant="Variant.Outlined">
-                <MudSelectItem Value="@(Catagory.Home)">Mortgage or Rent</MudSelectItem>
+                <!-- Make into common component -->
+            <MudSelect Disabled="!isEdit" Class="mt-2" Label="Catagory" @bind-Value="model.Catagory" For="(() => model.Catagory)" Variant="Variant.Outlined">
+                <MudSelectItem Value="@(Catagory.Home)">Home</MudSelectItem>
                 <MudSelectItem Value="@(Catagory.Transportation)" />
                 <MudSelectItem Value="@(Catagory.Food)" />
                 <MudSelectItem Value="@(Catagory.Utilities)" />
@@ -24,6 +25,9 @@
                 <MudSelectItem Value="@(Catagory.Shopping)" />
                 <MudSelectItem Value="@(Catagory.Entertainment)" />
                 <MudSelectItem Value="@(Catagory.Savings)" />
+                <MudSelectItem Value="@(Catagory.Charity)" />
+                <MudSelectItem Value="@(Catagory.Education)" />
+                <MudSelectItem Value="@(Catagory.ChildCare)">Child Care</MudSelectItem>
             </MudSelect>
             <MudTextField 
                 Class="mt-2"
@@ -151,18 +155,11 @@
                 });
             }
 
-            // Empty out form
-            if (!isEdit)
-            {
-                model = new Model();
-            }
-            else
-            {
-                isEdit = false;
-            }
-
             this.snackbar.Add($"Successfully {(isEdit ? "updated" : "saved")} the {model.Name} budget.", Severity.Success);
             ReloadBudgetList.Invoke();
+            model = new Model();
+            // Hard coded for now
+            model.DurationType = DurationType.MONTHLY;
         }
         catch (Exception)
         {

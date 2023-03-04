@@ -10,6 +10,9 @@
         Debt,
         Entertainment,
         Savings,
-        Shopping
+        Shopping,
+        Education,
+        Charity,
+        ChildCare
     }
 }

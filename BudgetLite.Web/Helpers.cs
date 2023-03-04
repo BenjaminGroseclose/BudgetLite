@@ -39,6 +39,12 @@ namespace BudgetLite.Web
                     return Icons.Filled.Savings;
                 case Catagory.Shopping:
                     return Icons.Filled.ShoppingCart;
+                case Catagory.Education:
+                    return Icons.Filled.School;
+                case Catagory.Charity:
+                    return Icons.Filled.VolunteerActivism;
+                case Catagory.ChildCare:
+                    return Icons.Filled.ChildCare;
                 default:
                     return Icons.Filled.Info;
             }

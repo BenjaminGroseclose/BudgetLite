@@ -1,12 +1,15 @@
 ﻿using BudgetLite.Data.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BudgetLite.Data.Models
 {
     public class Transaction : Entity
     {
+        [Key]
         public int TransactionID { get; set; }
 
+        [MaxLength(80)]
         public string Name { get; set; }
 
         public int BudgetPeriodID { get; set; }

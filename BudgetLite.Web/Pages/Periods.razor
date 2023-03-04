@@ -18,12 +18,16 @@
 </MudRadioGroup>*@
 
 <!-- Should have an option to view all budget periods for a budget -->
+<!-- 
+    Should show warning if exceed budget amount in a period also should be easy to see how 
+    much money is left in the period.
+-->
 @foreach(BudgetPeriod budgetPeriod in this.budgetsPeriods)
 {
     <MudCard Class="mt-5">
         <MudCardHeader>
             <MudIcon Class="mt-1 mr-3" Icon="@Helpers.BudgetIcon(budgetPeriod.Budget.Catagory)" />
-            <MudText Typo="Typo.h6">@budgetPeriod.Budget.Name @budgetPeriod.StartDate.ToShortDateString() - @budgetPeriod.EndDate.ToShortDateString()</MudText>
+            <MudText Typo="Typo.h6">@budgetPeriod.Budget.Name - @budgetPeriod.StartDate.ToString("MMMM yyyy")</MudText>
         </MudCardHeader>
         <MudCardContent>
             <MudStack Row="true">
@@ -53,7 +57,7 @@
             </MudStack>
         </MudCardContent>
         <MudCardActions>
-            <MudButton Color="Color.Primary" Variant="Variant.Outlined">View All Transactions</MudButton>
+            <MudButton Color="Color.Primary" Variant="Variant.Outlined" Href="@TransactionURL(budgetPeriod.BudgetPeriodID)">View All Transactions</MudButton>
         </MudCardActions>
     </MudCard>
 }
@@ -86,6 +90,11 @@
         this.LoadBudgetPeriodForDuration(DurationType.MONTHLY);
 
         await base.OnInitializedAsync();
+    }
+
+    private string TransactionURL(int budgetPeriodID)
+    {
+        return $"transactions?budgetPeriodID={budgetPeriodID}";
     }
 
     private void LoadBudgetPeriodForDuration(DurationType durationType)

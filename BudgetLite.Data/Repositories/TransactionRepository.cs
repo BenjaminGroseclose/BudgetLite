@@ -72,7 +72,8 @@ namespace BudgetLite.Data.Repositories
             transaction.Amount = entity.Amount;
             transaction.Date = entity.Date;
             transaction.BudgetPeriodID = entity.BudgetPeriodID;
-
+            transaction.Name = entity.Name;
+            transaction.Notes = entity.Notes;
             transaction.LastModifiedDate = DateTime.Now;
 
             this.context.Transactions.Update(transaction);

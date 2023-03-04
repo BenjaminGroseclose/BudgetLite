@@ -13,7 +13,7 @@ namespace BudgetLite.Data.Models
         public string Name { get; set; }
 
         [MaxLength(1000)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public Catagory Catagory { get; set; }
 
@@ -21,8 +21,9 @@ namespace BudgetLite.Data.Models
 
         public int? ParentBudgetID { get; set; }
 
-        [ForeignKey("User")]
         public int UserID { get; set; }
+
+        [ForeignKey("UserID")]
         public User User { get; set; }
 
         public DurationType DurationType { get; set; }
